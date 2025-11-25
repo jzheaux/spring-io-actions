@@ -1,0 +1,19 @@
+name: "close-milestone"
+description: "An action that closes the milestone associated with this project's version"
+author: "jzheaux"
+inputs:
+  milestone:
+    description: "The milestone to close; defaults to project's current version"
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - id: compute-version
+      if: ${{ inputs.milestone == '' }}
+      uses: ./compute-version
+    - shell: bash
+      run: |
+        MILESTONE_ID=$(gh api repos/$GITHUB_REPOSITORY/milestones --jq '.[] | select(.title == "${{ inputs.version }}") | .number')
+        if [ $MILESTONE_ID ]; then
+          gh api -X PATCH repos/$GITHUB_REPOSITORY/milestones/$MILESTONE_ID -f state='closed' --silent
+        fi
