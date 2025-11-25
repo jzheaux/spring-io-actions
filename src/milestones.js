@@ -1,4 +1,4 @@
-import { Octokit } from "octokit";
+const { Octokit } = require("octokit");
 
 /**
  * Helper for working with GitHub milestones via Octokit.
@@ -7,7 +7,7 @@ import { Octokit } from "octokit";
  *   const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
  *   const milestones = new Milestones(octokit, { owner: 'spring-io', repo: 'spring-security' });
  */
-export class Milestones {
+class Milestones {
     /**
      * @param {import("@octokit/rest").Octokit} octokit
      * @param {{ owner: string, repo: string }} repoInfo
@@ -107,4 +107,8 @@ export class Milestones {
             dueDate: updated.due_on || null,
         };
     }
+}
+
+module.exports = {
+    Milestones
 }

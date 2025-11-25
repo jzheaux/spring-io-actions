@@ -1,3 +1,5 @@
+const { _getReleaseDate, mod } = require('./lib');
+
 const t = {
     "M1": [0,6],
     "M2": [1,7],
@@ -13,14 +15,14 @@ function version(version, dueDate, type = "oss") {
     const patch = parseInt(parts[2], 10);
     const classifier = parts.length === 3 ? '' : parts[3];
     const today = new Date();
-    if (!dueDate)
+    if (!dueDate) {
         dueDate = new Date();
     }
     const test = { major, minor, patch, classifier,
         dueDate,
         type,
         isSnapshot: classifier === "SNAPSHOT",
-        isPrerelease: classifier && classifier !== "SNAPSHOT",
+        isPrerelease: !!(classifier && classifier !== "SNAPSHOT"),
         isGA: !classifier,
         nextRelease: (generation) => {
             if (test.isSnapshot) {
@@ -29,7 +31,7 @@ function version(version, dueDate, type = "oss") {
             if (test.isGA) {
                 return _nextGa(test, generation);
             }
-            return _nextMilestone(test);
+            return _nextMilestone(test, generation);
         },
         nextSnapshot: () => _nextSnapshot(test),
         toString: () => classifier ?
@@ -39,8 +41,12 @@ function version(version, dueDate, type = "oss") {
     return test;
 }
 
-function _nextGa(version, generation) {
-    return version(_nextGaVersion(version), _nextGaDate(version, generation));
+function _nextGa(v, generation) {
+    const next = _nextGaDate(v, generation);
+    if (!next) {
+        return null;
+    }
+    return version(_nextGaVersion(v), next.dueDate, next.type);
 }
 
 function _nextGaVersion(version) {
@@ -54,28 +60,32 @@ function _nextGaDate(version, generation) {
     const enterprise = generation.enterprise;
 
     let releaseMonth = (currentMonth + oss.frequency) - ((currentMonth - oss.offset) % oss.frequency);
-    let releaseYear = currentYear + releaseMonth / 12;
+    let releaseYear = currentYear + Math.floor(releaseMonth / 12);
     releaseMonth = mod(releaseMonth, 12);
 
     if (releaseMonth <= oss.end.month && releaseYear <= oss.end.year) {
         const dueDate = _getReleaseDate(releaseMonth, releaseYear, generation.dayOfWeek, generation.weekOfMonth);
-        return version(version.toString(), dueDate, "oss");
+        return { dueDate, type: "oss" };
     }
 
     releaseMonth = (currentMonth + enterprise.frequency) - ((currentMonth - enterprise.offset) % enterprise.frequency)
-    releaseYear = currentYear + releaseMonth / 12
+    releaseYear = currentYear + Math.floor(releaseMonth / 12);
     releaseMonth = mod(releaseMonth, 12);
 
     if (releaseMonth <= enterprise.end.month && releaseYear <= enterprise.end.year) {
-        const releaseDate = _getReleaseDate(releaseMonth, releaseYear, generation.dayOfWeek, generation.weekOfMonth);
-        return version(version.toString(), dueDate, "enterprise");
+        const dueDate = _getReleaseDate(releaseMonth, releaseYear, generation.dayOfWeek, generation.weekOfMonth);
+        return { dueDate, type: "enterprise" };
     }
 
     return null;
 }
 
-function _nextMilestone(version, generation) {
-    return version(_nextMilestoneVersion(version), _nextMilestoneDate(version, generation));
+function _nextMilestone(v, generation) {
+    const nextDate = _nextMilestoneDate(v, generation);
+    if (!nextDate) {
+        return null;
+    }
+    return version(_nextMilestoneVersion(v), nextDate, v.type);
 }
 
 function _nextMilestoneVersion(version) {
@@ -98,7 +108,7 @@ function _nextMilestoneDate(version, generation) {
     const month = candidateMonths[currentMonth > candidateMonths[0]];
     const year = currentDate.getFullYear();
     const releaseDate = _getReleaseDate(month, year, generation.dayOfWeek, generation.weekOfMonth);
-    return dueDate;
+    return releaseDate;
 }
 
 function _nextSnapshot(version) {
@@ -117,19 +127,6 @@ function _nextSnapshot(version) {
  *
  * Returns a Date corresponding to that week/day combination.
  */
-function _getReleaseDate(month, year, dayOfWeek, weekOfMonth) {
-    const firstOfMonth = new Date(year, month, 1);
-    const firstDayOfMonth = firstOfMonth.getDay();
-    const firstDayMonBased = (firstDayOfMonth + 6) % 7;
-    const offsetToFirstMonday = (7 - firstDayMonBased) % 7;
-    const firstFullWeekMonday = 1 + offsetToFirstMonday;
-    const inputDayMonBased = (dayOfWeek + 6) % 7;
-    const dayOfMonth = firstFullWeekMonday + weekOfMonth * 7 + inputDayMonBased;
-    return new Date(year, month, dayOfMonth);
-}
-
-const mod = (a, n) => ((a % n) + n) % n;
-
 module.exports = {
     version
 };

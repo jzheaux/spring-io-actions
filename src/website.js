@@ -1,18 +1,18 @@
-import { Octokit } from "octokit";
-import { Base64 } from 'js-base64';
+const { Octokit } = require("octokit");
+const { Base64 } = require("js-base64");
 
-export class WebsiteContentManager {
+class WebsiteContentManager {
     constructor(token, repo, slug) {
         this.gh = new Octokit({ auth: token });
         this.repo = repo;
         this.slug = slug;
     }
 
-    async function getGenerationByVersion(version) {
-        const file = _load(this.gh, this.repo, `/project/${slug}/generations.json`);
+    async getGenerationByVersion(version) {
+        const file = await _load(this.gh, this.repo, `/project/${this.slug}/generations.json`);
         const asStrings = JSON.parse(file);
         const generations = Array();
-        for (const generation in asStrings) {
+        for (const generation of asStrings) {
             const majorMinor = _generation(generation.generation);
             if (majorMinor.major === version.major &&
                 majorMinor.minor === version.minor) {
@@ -32,7 +32,7 @@ export class WebsiteContentManager {
                 };
                 return result;
             }
-        });
+        }
         return null;
     }
 
@@ -59,7 +59,7 @@ async function _load(gh, repo, path) {
 
         // The content is returned in base64 encoding
         const encodedContent = response.data.content;
-        return generations.generaionsBase64.decode(encodedContent);
+        return Base64.decode(encodedContent);
     } catch (error) {
         console.error('Error retrieving file content:', error);
         throw error;
@@ -77,6 +77,7 @@ function _date(date) {
 }
 
 module.exports = {
+    WebsiteContentManager,
     computeSlug,
     computeWebsiteRepository
 }
