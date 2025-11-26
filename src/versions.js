@@ -1,4 +1,4 @@
-const { _getReleaseDate, mod } = require('./lib');
+const { getReleaseDate, mod } = require('lib');
 
 const t = {
     "M1": [0,6],
@@ -8,37 +8,65 @@ const t = {
     "": [4,10]
 }
 
-function version(version, dueDate, type = "oss") {
-    const parts = version.split(/[.-]/);
-    const major = parseInt(parts[0], 10);
-    const minor = parseInt(parts[1], 10);
-    const patch = parseInt(parts[2], 10);
-    const classifier = parts.length === 3 ? '' : parts[3];
-    const today = new Date();
-    if (!dueDate) {
-        dueDate = new Date();
+class Version {
+    constructor(version, dueDate = new Date(), type = "oss") {
+        this._version = version;
+        this._dueDate = dueDate;
+        this._type = type;
+        const parts = version.split(/[.-]/);
+        this._major = parseInt(parts[0], 10);
+        this._minor = parseInt(parts[1], 10);
+        this._patch = parseInt(parts[2], 10);
+        this._classifier = parts.length === 3 ? '' : parts[3];
     }
-    const test = { major, minor, patch, classifier,
-        dueDate,
-        type,
-        isSnapshot: classifier === "SNAPSHOT",
-        isPrerelease: !!(classifier && classifier !== "SNAPSHOT"),
-        isGA: !classifier,
-        nextRelease: (generation) => {
-            if (test.isSnapshot) {
-                return null;
-            }
-            if (test.isGA) {
-                return _nextGa(test, generation);
-            }
-            return _nextMilestone(test, generation);
-        },
-        nextSnapshot: () => _nextSnapshot(test),
-        toString: () => classifier ?
-            `${major}.${minor}.${patch}-${classifier}` :
-            `${major}.${minor}.${patch}`
-    };
-    return test;
+
+    static fromMilestone(milestone) {
+        return new Version(milestone.title, milestone.dueDate, milestone.type)
+    }
+
+    accessor version() {
+        return this._version;
+    }
+
+    accessor dueDate() {
+        return this._dueDate;
+    }
+
+    accessor type() {
+        return this._type;
+    }
+
+    accessor snapshot() {
+        return this._classifier === "SNAPSHOT";
+    }
+
+    accessor prerelease() {
+        return !!(this._classifier && this._classifier !== "SNAPSHOT");
+    }
+
+    accessor ga() {
+        return !this._classifier;
+    }
+
+    nextRelease(generation) {
+        if (this.snapshot) {
+            return null;
+        }
+        if (this.ga) {
+            return _nextGa(this, generation);
+        }
+        return _nextMilestone(this, generation);
+    }
+
+    nextSnapshot() {
+        return _nextSnapshot(this);
+    }
+
+    toString() {
+        return this._classifier ?
+            `${this._major}.${this._minor}.${this._patch}-${this._classifier}` :
+            `${this._major}.${this._minor}.${this._patch}`;
+    }
 }
 
 function _nextGa(v, generation) {
@@ -46,7 +74,7 @@ function _nextGa(v, generation) {
     if (!next) {
         return null;
     }
-    return version(_nextGaVersion(v), next.dueDate, next.type);
+    return new Version(_nextGaVersion(v), next.dueDate, next.type);
 }
 
 function _nextGaVersion(version) {
@@ -64,7 +92,7 @@ function _nextGaDate(version, generation) {
     releaseMonth = mod(releaseMonth, 12);
 
     if (releaseMonth <= oss.end.month && releaseYear <= oss.end.year) {
-        const dueDate = _getReleaseDate(releaseMonth, releaseYear, generation.dayOfWeek, generation.weekOfMonth);
+        const dueDate = getReleaseDate(releaseMonth, releaseYear, generation.dayOfWeek, generation.weekOfMonth);
         return { dueDate, type: "oss" };
     }
 
@@ -73,7 +101,7 @@ function _nextGaDate(version, generation) {
     releaseMonth = mod(releaseMonth, 12);
 
     if (releaseMonth <= enterprise.end.month && releaseYear <= enterprise.end.year) {
-        const dueDate = _getReleaseDate(releaseMonth, releaseYear, generation.dayOfWeek, generation.weekOfMonth);
+        const dueDate = getReleaseDate(releaseMonth, releaseYear, generation.dayOfWeek, generation.weekOfMonth);
         return { dueDate, type: "enterprise" };
     }
 
@@ -81,52 +109,40 @@ function _nextGaDate(version, generation) {
 }
 
 function _nextMilestone(v, generation) {
-    const nextDate = _nextMilestoneDate(v, generation);
-    if (!nextDate) {
-        return null;
-    }
-    return version(_nextMilestoneVersion(v), nextDate, v.type);
+    const nextVersion = new Version(_nextMilestoneVersion(v), v.dueDate, v.type);
+    const nextDate = _nextMilestoneDate(nextVersion, generation);
+    return new Version(nextVersion.toString(), nextDate, v.type);
 }
 
 function _nextMilestoneVersion(version) {
-    if (version.classifier === "M1") {
-        return `${version.major}.${version.minor}.${version.patch}-M2`;
+    if (version._classifier === "M1") {
+        return `${version._major}.${version._minor}.${version._patch}-M2`;
     }
-    if (version.classifier === "M2") {
-        return `${version.major}.${version.minor}.${version.patch}-M3`;
+    if (version._classifier === "M2") {
+        return `${version._major}.${version._minor}.${version._patch}-M3`;
     }
-    if (version.classifier.startsWith("M")) {
-        return `${version.major}.${version.minor}.${version.patch}-RC1`;
+    if (version._classifier.startsWith("M")) {
+        return `${version._major}.${version._minor}.${version._patch}-RC1`;
     }
-    return null;
+    return `${version._major}.${version._minor}.${version._patch}`;
 }
 
 function _nextMilestoneDate(version, generation) {
-    const candidateMonths = t[version.classifier];
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth();
-    const month = candidateMonths[currentMonth > candidateMonths[0]];
-    const year = currentDate.getFullYear();
-    const releaseDate = _getReleaseDate(month, year, generation.dayOfWeek, generation.weekOfMonth);
-    return releaseDate;
+    const currentMonth = version.dueDate.getMonth();
+    const candidateMonths = t[version._classifier];
+    const index = mod(candidateMonths[0] - currentMonth, 12) < mod(candidateMonths[1] - currentMonth, 12) ? 0 : 1;
+    const month = candidateMonths[index];
+    const year = version.dueDate.getFullYear() + (month < currentMonth);
+    return getReleaseDate(month, year, generation.dayOfWeek, generation.weekOfMonth);
 }
 
 function _nextSnapshot(version) {
     if (version.classifier === "SNAPSHOT") {
-        return version(`${version.major}.${version.minor}.${version.patch + 1}-SNAPSHOT`);
+        return new Version(`${version.major}.${version.minor}.${version.patch + 1}-SNAPSHOT`);
     }
-    return version(`${version.major}.${version.minor}.${version.patch}-SNAPSHOT`);
+    return new Version(`${version.major}.${version.minor}.${version.patch}-SNAPSHOT`);
 }
 
-/**
- * Given:
- *   monthZeroBased: 0 = January
- *   year: four-digit year
- *   dayOfWeek: 0=Sun..6=Sat (JavaScript convention)
- *   weekOfMonth: 0 = first full Monday-starting week
- *
- * Returns a Date corresponding to that week/day combination.
- */
 module.exports = {
-    version
+    Version
 };

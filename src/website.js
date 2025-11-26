@@ -1,23 +1,25 @@
 const { Octokit } = require("octokit");
 const { Base64 } = require("js-base64");
+const { getWeekOfMonthAndDayOfWeek } = require('lib');
 
-class WebsiteContentManager {
-    constructor(token, repo, slug) {
-        this.gh = new Octokit({ auth: token });
-        this.repo = repo;
-        this.slug = slug;
+class Website {
+    constructor(inputs) {
+        this.gh = new Octokit({ auth: inputs.websiteToken });
+        this.repo = inputs.websiteRepository;
+        this.slug = inputs.projectSlug;
     }
 
     async getGenerationByVersion(version) {
         const file = await _load(this.gh, this.repo, `/project/${this.slug}/generations.json`);
         const asStrings = JSON.parse(file);
-        const generations = Array();
+        const { dayOfWeek, weekOfMonth } = getWeekOfMonthAndDayOfWeek(version.dueDate);
         for (const generation of asStrings) {
             const majorMinor = _generation(generation.generation);
             if (majorMinor.major === version.major &&
                 majorMinor.minor === version.minor) {
                 const result = {
                     generation: majorMinor,
+                    dayOfWeek, weekOfMonth,
                     oss: {
                         frequency: 1,
                         offset: 0,
@@ -36,18 +38,6 @@ class WebsiteContentManager {
         return null;
     }
 
-}
-
-function computeSlug(repo) {
-    return repo.replace("-commercial", "");
-}
-
-function computeWebsiteRepository(repo) {
-    if (repo.endsWith("-commercial")) {
-        return "spring-io/spring-website-commercial-content";
-    } else {
-        return "spring-io/spring-website-content";
-    }
 }
 
 async function _load(gh, repo, path) {
@@ -77,7 +67,5 @@ function _date(date) {
 }
 
 module.exports = {
-    WebsiteContentManager,
-    computeSlug,
-    computeWebsiteRepository
+    Website
 }

@@ -1,0 +1,35 @@
+name: "learn-page-update-action"
+description: "Update #learn Page on Spring OSS and Commercial Websites"
+author: "jzheaux"
+inputs:
+  gchat-webhook-url:
+    description: "The GChat Webhook to POST the announcement message to"
+    required: true
+  milestone-title:
+    description: "The planned milestone"
+    required: true
+  milestone-date:
+    description: "The milestone's scheduled release date"
+    required: true
+  project-name:
+    description: "the project name (for example, spring-security); will use repo name if not provided"
+    required: false
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+  - name: Compute Project Name
+    id: project-name
+    shell: bash
+    run: |
+      project-name="$(echo ${GITHUB_REPOSITORY} | cut -d '/' -f 2)" >> $GITHUB_OUTPUT
+  - name: Announce Release on GChat
+    shell: bash
+    env:
+      MILESTONE_DATE: ${{ inputs.milestone-date }}
+      MILESTONE_TITLE: ${{ inputs.milestone-title }}
+      PROJECT_NAME: ${{ inputs.project-name || steps.project-name.outputs.project-name }}
+      WEBHOOK_URL: ${{ input.gchat-webhook-url }}
+    run: |
+      curl -X POST "${WEBHOOK_URL}" -H 'Content-Type: application/json' -d "{ \"text\": \"${PROJECT_NAME}-planning $(echo '`')${MILESTONE_TITLE}$(echo '`') on ${MILESTONE_DATE}\" }" || true

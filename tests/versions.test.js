@@ -1,5 +1,26 @@
 const { version } = require('../src/versions');
 
+const generation = {
+    dayOfWeek: 1,
+    weekOfMonth: 3,
+    oss: {
+        frequency: 1,
+        offset: 0,
+        end: {
+            year: 2026,
+            month: 11
+        }
+    },
+    enterprise: {
+        frequency: 3,
+        offset: 1,
+        end: {
+            year: 2027,
+            month: 2
+        }
+    }
+};
+
 describe('version', () => {
     it('should parse a GA version', () => {
         const v = version('1.2.3');
@@ -35,27 +56,7 @@ describe('version', () => {
     });
 
     it('should calculate the next GA release', () => {
-        const generation = {
-            dayOfWeek: 1,
-            weekOfMonth: 3,
-            oss: {
-                frequency: 1,
-                offset: 0,
-                end: {
-                    year: 2026,
-                    month: 11
-                }
-            },
-            enterprise: {
-                frequency: 3,
-                offset: 1,
-                end: {
-                    year: 2027,
-                    month: 2
-                }
-            }
-        };
-        const v = version('1.2.3', new Date('2025-11-24'));
+        const v = version('1.2.3', new Date(2025, 10, 24));
         const next = v.nextRelease(generation);
         expect(next.toString()).toBe('1.2.4');
         expect(next.type).toBe('oss');
@@ -69,9 +70,22 @@ describe('version', () => {
             dayOfWeek: 1,
             weekOfMonth: 3
         };
-        const v = version('1.2.3-M1', new Date('2025-11-24'));
+        const v = version('1.2.3-M1', new Date(2025, 10, 24));
         const next = v.nextRelease(generation);
         expect(next.toString()).toBe('1.2.3-M2');
         expect(next.type).toBe('oss');
+        expect(next.dueDate.getFullYear()).toBe(2026)
+        expect(next.dueDate.getMonth()).toBe(1) // M2 releases in February and August
+        expect(next.dueDate.getDate()).toBe(23)
+    });
+
+    it('should calculate the next GA commercial release', () => {
+        const v = version('1.2.3', new Date(2026, 11, 28));
+        const next = v.nextRelease(generation);
+        expect(next.toString()).toBe('1.2.4');
+        expect(next.type).toBe('enterprise');
+        expect(next.dueDate.getFullYear()).toBe(2027);
+        expect(next.dueDate.getMonth()).toBe(1); // commercial releases are Feb, May, Aug, Nov
+        expect(next.dueDate.getDate()).toBe(22);
     });
 });

@@ -1,9 +1,9 @@
-const { getWeekOfMonthAndDayOfWeek, _getReleaseDate, mod } = require('../src/lib');
+const { getWeekOfMonthAndDayOfWeek, getReleaseDate, mod } = require('../src/lib');
 
 describe('getWeekOfMonthAndDayOfWeek', () => {
     it('should return the correct week of month and day of week', () => {
         // November 24, 2025 is a Monday
-        const date = new Date('2025-11-24');
+        const date = new Date(2025, 10, 24);
         const { dayOfWeek, weekOfMonth } = getWeekOfMonthAndDayOfWeek(date);
         expect(dayOfWeek).toBe(1);
         expect(weekOfMonth).toBe(3);
@@ -11,28 +11,42 @@ describe('getWeekOfMonthAndDayOfWeek', () => {
 
     it('should handle the first week of the month', () => {
         // November 3, 2025 is a Monday
-        const date = new Date('2025-11-03');
+        const date = new Date(2025, 10, 3);
         const { dayOfWeek, weekOfMonth } = getWeekOfMonthAndDayOfWeek(date);
         expect(dayOfWeek).toBe(1);
         expect(weekOfMonth).toBe(0);
     });
 
     it('should handle a day later in the week', () => {
-        // November 7, 2025 is a Friday
-        const date = new Date('2025-11-07');
+        // December 9, 2025 is a Tuesday
+        const date = new Date(2025, 11, 9);
         const { dayOfWeek, weekOfMonth } = getWeekOfMonthAndDayOfWeek(date);
-        expect(dayOfWeek).toBe(5);
-        expect(weekOfMonth).toBe(0);
+        expect(dayOfWeek).toBe(2);
+        expect(weekOfMonth).toBe(1);
     });
 });
 
-describe('_getReleaseDate', () => {
-    it('should return the correct release date', () => {
-        // third Monday in November 2025
-        const date = _getReleaseDate(10, 2025, 1, 3);
+describe('getReleaseDate', () => {
+    it('fourth Monday of November 2025 is 24 November', () => {
+        const date = getReleaseDate(10, 2025, 1, 3);
         expect(date.getFullYear()).toBe(2025);
         expect(date.getMonth()).toBe(10);
         expect(date.getDate()).toBe(24);
+    });
+
+    it('first Wednesday of November 2025 is 5 November', () => {
+        const date = getReleaseDate(10, 2025, 3, 0);
+        expect(date.getFullYear()).toBe(2025);
+        expect(date.getMonth()).toBe(10);
+        expect(date.getDate()).toBe(5);
+    });
+
+    it('second Thursday of November 2025 is 13 November', () => {
+        // fourth Monday in November 2025
+        const date = getReleaseDate(10, 2025, 4, 1);
+        expect(date.getFullYear()).toBe(2025);
+        expect(date.getMonth()).toBe(10);
+        expect(date.getDate()).toBe(13);
     });
 });
 
