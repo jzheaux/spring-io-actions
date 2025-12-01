@@ -1,4 +1,4 @@
-const { version } = require('../src/versions');
+const { Version } = require('../src/versions');
 
 const generation = {
     dayOfWeek: 1,
@@ -23,40 +23,40 @@ const generation = {
 
 describe('version', () => {
     it('should parse a GA version', () => {
-        const v = version('1.2.3');
+        const v = new Version('1.2.3');
         expect(v.major).toBe(1);
         expect(v.minor).toBe(2);
         expect(v.patch).toBe(3);
         expect(v.classifier).toBe('');
-        expect(v.isGA).toBe(true);
-        expect(v.isPrerelease).toBe(false);
-        expect(v.isSnapshot).toBe(false);
+        expect(v.ga).toBe(true);
+        expect(v.prerelease).toBe(false);
+        expect(v.snapshot).toBe(false);
     });
 
     it('should parse a milestone version', () => {
-        const v = version('1.2.3-M1');
+        const v = new Version('1.2.3-M1');
         expect(v.major).toBe(1);
         expect(v.minor).toBe(2);
         expect(v.patch).toBe(3);
         expect(v.classifier).toBe('M1');
-        expect(v.isGA).toBe(false);
-        expect(v.isPrerelease).toBe(true);
-        expect(v.isSnapshot).toBe(false);
+        expect(v.ga).toBe(false);
+        expect(v.prerelease).toBe(true);
+        expect(v.snapshot).toBe(false);
     });
 
     it('should parse a snapshot version', () => {
-        const v = version('1.2.3-SNAPSHOT');
+        const v = new Version('1.2.3-SNAPSHOT');
         expect(v.major).toBe(1);
         expect(v.minor).toBe(2);
         expect(v.patch).toBe(3);
         expect(v.classifier).toBe('SNAPSHOT');
-        expect(v.isGA).toBe(false);
-        expect(v.isPrerelease).toBe(false);
-        expect(v.isSnapshot).toBe(true);
+        expect(v.ga).toBe(false);
+        expect(v.prerelease).toBe(false);
+        expect(v.snapshot).toBe(true);
     });
 
     it('should calculate the next GA release', () => {
-        const v = version('1.2.3', new Date(2025, 10, 24));
+        const v = new Version('1.2.3', new Date(2025, 10, 24));
         const next = v.nextRelease(generation);
         expect(next.toString()).toBe('1.2.4');
         expect(next.type).toBe('oss');
@@ -70,7 +70,7 @@ describe('version', () => {
             dayOfWeek: 1,
             weekOfMonth: 3
         };
-        const v = version('1.2.3-M1', new Date(2025, 10, 24));
+        const v = new Version('1.2.3-M1', new Date(2025, 10, 24));
         const next = v.nextRelease(generation);
         expect(next.toString()).toBe('1.2.3-M2');
         expect(next.type).toBe('oss');
@@ -80,7 +80,7 @@ describe('version', () => {
     });
 
     it('should calculate the next GA commercial release', () => {
-        const v = version('1.2.3', new Date(2026, 11, 28));
+        const v = new Version('1.2.3', new Date(2026, 11, 28));
         const next = v.nextRelease(generation);
         expect(next.toString()).toBe('1.2.4');
         expect(next.type).toBe('enterprise');

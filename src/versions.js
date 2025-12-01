@@ -1,4 +1,4 @@
-const { getReleaseDate, mod } = require('lib');
+const { getReleaseDate, mod } = require('./lib');
 
 const t = {
     "M1": [0,6],
@@ -24,27 +24,43 @@ class Version {
         return new Version(milestone.title, milestone.dueDate, milestone.type)
     }
 
-    accessor version() {
+    get version() {
         return this._version;
     }
 
-    accessor dueDate() {
+    get major() {
+        return this._major;
+    }
+
+    get minor() {
+        return this._minor;
+    }
+
+    get patch() {
+        return this._patch;
+    }
+
+    get classifier() {
+        return this._classifier;
+    }
+
+    get dueDate() {
         return this._dueDate;
     }
 
-    accessor type() {
+    get type() {
         return this._type;
     }
 
-    accessor snapshot() {
+    get snapshot() {
         return this._classifier === "SNAPSHOT";
     }
 
-    accessor prerelease() {
+    get prerelease() {
         return !!(this._classifier && this._classifier !== "SNAPSHOT");
     }
 
-    accessor ga() {
+    get ga() {
         return !this._classifier;
     }
 
@@ -78,7 +94,7 @@ function _nextGa(v, generation) {
 }
 
 function _nextGaVersion(version) {
-    return `${version.major}.${version.minor}.${version.patch + 1}`;
+    return `${version._major}.${version._minor}.${version._patch + 1}`;
 }
 
 function _nextGaDate(version, generation) {
