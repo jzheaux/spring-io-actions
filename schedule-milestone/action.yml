@@ -12,5 +12,5 @@ inputs:
     description: "The milestone description"
     required: false
 runs:
-  using: "node16"
+  using: "node20"
   main: "index.js"

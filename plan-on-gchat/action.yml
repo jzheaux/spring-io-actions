@@ -15,5 +15,5 @@ inputs:
     description: "the project name (for example, spring-security); will use repo name if not provided"
     required: false
 runs:
-  using: "node16"
+  using: "node20"
   main: "index.js"
