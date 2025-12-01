@@ -5,10 +5,11 @@
   "main": "src/main/javascript/index.js",
   "dependencies": {
     "@actions/core": "^1.11.1",
+    "axios": "^1.13.2",
     "compare-versions": "^6.1.0",
+    "js-base64": "^3.7.5",
     "minimist": "^1.2.6",
-    "octokit": "^3.1.0",
-    "js-base64": "^3.7.5"
+    "octokit": "^3.1.0"
   },
   "devDependencies": {
     "esbuild": "^0.19.5",

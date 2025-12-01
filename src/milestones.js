@@ -1,5 +1,4 @@
 const { Octokit } = require("octokit");
-
 /**
  * Helper for working with GitHub milestones via Octokit.
  *
@@ -43,6 +42,38 @@ class Milestones {
         };
     }
 
+    async closeMilestone(title) {
+        const milestone = await this.findMilestoneByName(title);
+        if (milestone) {
+            await this.octokit.rest.issues.updateMilestone({
+                owner: this.repo.split('/')[0],
+                repo: this.repo.split('/')[1],
+                milestone_number: milestone.number,
+                state: 'closed'
+            });
+        }
+    }
+
+    async scheduleMilestone(title, date, description) {
+        const milestone = await this.findMilestoneByName(title);
+        if (milestone) {
+            await this.octokit.rest.issues.updateMilestone({
+                owner: this.repo.split('/')[0],
+                repo: this.repo.split('/')[1],
+                milestone_number: milestone.number,
+                due_on: date,
+                description: description
+            });
+        } else {
+            await this.octokit.rest.issues.createMilestone({
+                owner: this.repo.split('/')[0],
+                repo: this.repo.split('/')[1],
+                title: title,
+                due_on: date,
+                description: description
+            });
+        }
+    }
 }
 
 module.exports = {
