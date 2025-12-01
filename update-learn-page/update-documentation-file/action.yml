@@ -1,0 +1,32 @@
+name: "update-documentation-file"
+description: "Update documentation.json File"
+author: "jzheaux"
+inputs:
+  github-token:
+    description: "The GitHub token needed to access spring-website-content or spring-website-commercial-content"
+    required: true
+  api-doc-url:
+    description: "The URL to the project's JavaDoc; supports {version} placeholder"
+    default: "https://docs.spring.io/{project}/site/docs/{version}/api/"
+    required: false
+  is-commercial:
+    description: "Whether the project is commercial; defaults to true if repository name ends in '-commercial'"
+    required: false
+  is-antora:
+    description: "Whether the reference documentation is Antora-based; defaults to true"
+    default: "true"
+    required: false
+  project-slug:
+    description: "the project name (for example, spring-security); will use repo name if not provided"
+    required: false
+  ref-doc-url:
+    description: "The URL to the project's reference documentation; supports {version} placeholder"
+    default: "https://docs.spring.io/{project}/reference/{version}/index.html"
+    required: false
+  version:
+    description: "The current GA version; will read gradle.properties or pom.xml if not provided"
+    required: false
+
+runs:
+  using: 'node20'
+  main: '../../javascript/index.js'
