@@ -1,0 +1,21 @@
+const core = require('@actions/core');
+const { Milestones } = require('../src/milestones');
+
+async function run() {
+  try {
+    const milestoneTitle = core.getInput('milestone-title');
+    const milestoneDate = core.getInput('milestone-date');
+    const milestoneDescription = core.getInput('milestone-description');
+    const token = process.env.GITHUB_TOKEN;
+    const milestones = new Milestones(token);
+    await milestones.scheduleMilestone(milestoneTitle, milestoneDate, milestoneDescription);
+  } catch (error) {
+    core.setFailed(error.message);
+  }
+}
+
+if (require.main === module) {
+  run();
+}
+
+module.exports = run;
