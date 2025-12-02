@@ -2,7 +2,7 @@ const core = require('@actions/core');
 
 class Inputs {
     constructor() {
-        this._githubToken = core.getInput('github-token', { required: true });
+        this._websiteToken = core.getInput('website-token', { required: true });
         this._apiDocUrl = core.getInput('api-doc-url', { required: false }) || "https://docs.spring.io/{project}/site/docs/{version}/api/";
         this._websiteRepository = core.getInput('website-repository', { required: false });
         this._isAntora = core.getBooleanInput('is-antora', { required: false });
@@ -11,8 +11,8 @@ class Inputs {
         this._version = core.getInput('version', { required: true });
     }
 
-    get githubToken() {
-        return this._githubToken;
+    get websiteToken() {
+        return this._websiteToken;
     }
 
     get apiDocUrl() {

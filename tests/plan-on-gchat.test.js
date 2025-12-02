@@ -1,9 +1,11 @@
 const core = require('@actions/core');
-const gchat = require('../src/gchat');
-const run = require('../plan-on-gchat/index');
+const { Inputs } = require('../src/plan-on-gchat/inputs');
+const { Announce } = require('../src/gchat');
+const { run } = require('../src/plan-on-gchat/run');
 
 jest.mock('@actions/core');
 jest.mock('../src/gchat');
+jest.mock('../src/plan-on-gchat/inputs');
 
 describe('plan-on-gchat', () => {
 	beforeEach(() => {
@@ -11,42 +13,32 @@ describe('plan-on-gchat', () => {
 	});
 
 	it('plans a release', async () => {
-		core.getInput.mockImplementation((name) => {
-			if (name === 'gchat-webhook-url') {
-				return 'https://example.com';
-			}
-			if (name === 'milestone-title') {
-				return 'title';
-			}
-			if (name === 'milestone-date') {
-				return '2025-12-25';
-			}
-		});
+		inputs = {
+			webhookUrl: 'https://example.com',
+			milestoneTitle: 'title',
+			milestoneDate: '2025-12-25'
+        };
+        Inputs.mockImplementation(() => inputs);
 		await run();
-		expect(gchat.postMessage).toHaveBeenCalledWith('https://example.com', 'repo-planning `title` on 2025-12-25');
+		expect(Announce.prototype.constructor).toHaveBeenCalledWith('https://example.com', 'repo');
+		expect(Announce.prototype.planRelease).toHaveBeenCalledWith('title', '2025-12-25');
 	});
 
 	it('uses project-name', async () => {
-		core.getInput.mockImplementation((name) => {
-			if (name === 'gchat-webhook-url') {
-				return 'https://example.com';
-			}
-			if (name === 'milestone-title') {
-				return 'title';
-			}
-			if (name === 'milestone-date') {
-				return '2025-12-25';
-			}
-			if (name === 'project-name') {
-				return 'project';
-			}
-		});
+		inputs = {
+			webhookUrl: 'https://example.com',
+			milestoneTitle: 'title',
+			milestoneDate: '2025-12-25',
+			projectName: 'project'
+        };
+        Inputs.mockImplementation(() => inputs);
 		await run();
-		expect(gchat.postMessage).toHaveBeenCalledWith('https://example.com', 'project-planning `title` on 2025-12-25');
+		expect(Announce.prototype.constructor).toHaveBeenCalledWith('https://example.com', 'project');
+		expect(Announce.prototype.planRelease).toHaveBeenCalledWith('title', '2025-12-25');
 	});
 
 	it('handles errors', async () => {
-		core.getInput.mockImplementation(() => {
+		Announce.prototype.planRelease.mockImplementation(() => {
 			throw new Error('error');
 		});
 		await run();

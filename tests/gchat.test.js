@@ -1,11 +1,12 @@
 const axios = require('axios');
-const { postMessage } = require('../src/gchat');
+const { Announce } = require('../src/gchat');
 
 jest.mock('axios');
 
 describe('gchat', () => {
 	it('postMessage posts', async () => {
-		await postMessage('https://example.com', 'a message');
-		expect(axios.post).toHaveBeenCalledWith('https://example.com', { text: 'a message' });
+		const announce = new Announce('https://example.com', 'repo');
+		await announce.announceRelease('1.2.3');
+		expect(axios.post).toHaveBeenCalledWith('https://example.com', { text: 'repo-announcing `1.2.3` is available now' });
 	});
 });

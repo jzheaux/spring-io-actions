@@ -1,11 +1,11 @@
 const core = require('@actions/core');
 const { Octokit } = require('octokit');
-const { Inputs } = require('../update-learn-page/inputs');
+const { Inputs } = require('../src/update-learn-page/inputs');
 const { run } = require('../src/update-learn-page/run');
 
 jest.mock('@actions/core');
 jest.mock('octokit');
-jest.mock('../update-learn-page/inputs');
+jest.mock('../src/update-learn-page/inputs');
 
 describe('Update Learn Page Action', () => {
     let inputs;
@@ -13,7 +13,7 @@ describe('Update Learn Page Action', () => {
 
     beforeEach(() => {
         inputs = {
-            githubToken: 'token',
+            websiteToken: 'token',
             version: '1.2.3',
             projectName: 'spring-projects/spring-boot',
             websiteRepository: 'spring-io/spring-website-content',
@@ -62,6 +62,16 @@ describe('Update Learn Page Action', () => {
             {
                 version: '1.1.0',
                 status: 'GENERAL_AVAILABILITY',
+                current: false
+            },
+            {
+                version: '1.2.2',
+                status: 'GENERAL_AVAILABILITY',
+                current: true
+            },
+            {
+                version: '1.2.3-SNAPSHOT',
+                status: 'SNAPSHOT',
                 current: true
             }
         ];

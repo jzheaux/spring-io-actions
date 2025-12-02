@@ -2,7 +2,7 @@ name: "Update Learn Page"
 description: "Update #learn Page on Spring OSS and Commercial Websites"
 author: "jzheaux"
 inputs:
-  github-token:
+  website-token:
     description: "The GitHub token needed to access spring-website-content or spring-website-commercial-content"
     required: true
   api-doc-url:
@@ -24,7 +24,7 @@ inputs:
     default: "https://docs.spring.io/{project}/reference/{version}/index.html"
     required: false
   version:
-    description: "The current GA version"
+    description: "The current version"
     required: true
 runs:
   using: "node20"

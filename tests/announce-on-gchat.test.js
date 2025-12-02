@@ -1,9 +1,11 @@
 const core = require('@actions/core');
-const gchat = require('../src/gchat');
-const run = require('../announce-on-gchat/index');
+const { Inputs } = require('../src/announce-on-gchat/inputs');
+const { Announce } = require('../src/gchat');
+const { run } = require('../src/announce-on-gchat/run');
 
 jest.mock('@actions/core');
 jest.mock('../src/gchat');
+jest.mock('../src/announce-on-gchat/inputs');
 
 describe('announce-on-gchat', () => {
 	beforeEach(() => {
@@ -11,36 +13,30 @@ describe('announce-on-gchat', () => {
 	});
 
 	it('announces a release', async () => {
-		core.getInput.mockImplementation((name) => {
-			if (name === 'gchat-webhook-url') {
-				return 'https://example.com';
-			}
-			if (name === 'project-version') {
-				return '1.2.3';
-			}
-		});
+		inputs = {
+			webhookUrl: 'https://example.com',
+			projectVersion: '1.2.3'
+        };
+        Inputs.mockImplementation(() => inputs);
 		await run();
-		expect(gchat.postMessage).toHaveBeenCalledWith('https://example.com', 'repo-announcing `1.2.3` is available now');
+		expect(Announce.prototype.constructor).toHaveBeenCalledWith('https://example.com', 'repo');
+		expect(Announce.prototype.announceRelease).toHaveBeenCalledWith('1.2.3');
 	});
 
 	it('uses project-name', async () => {
-		core.getInput.mockImplementation((name) => {
-			if (name === 'gchat-webhook-url') {
-				return 'https://example.com';
-			}
-			if (name === 'project-version') {
-				return '1.2.3';
-			}
-			if (name === 'project-name') {
-				return 'project';
-			}
-		});
+		inputs = {
+			webhookUrl: 'https://example.com',
+			projectVersion: '1.2.3',
+			projectName: 'project'
+        };
+        Inputs.mockImplementation(() => inputs);
 		await run();
-		expect(gchat.postMessage).toHaveBeenCalledWith('https://example.com', 'project-announcing `1.2.3` is available now');
+		expect(Announce.prototype.constructor).toHaveBeenCalledWith('https://example.com', 'project');
+		expect(Announce.prototype.announceRelease).toHaveBeenCalledWith('1.2.3');
 	});
 
 	it('handles errors', async () => {
-		core.getInput.mockImplementation(() => {
+		Announce.prototype.announceRelease.mockImplementation(() => {
 			throw new Error('error');
 		});
 		await run();
