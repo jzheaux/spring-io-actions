@@ -83,6 +83,10 @@ class Version {
             `${this._major}.${this._minor}.${this._patch}-${this._classifier}` :
             `${this._major}.${this._minor}.${this._patch}`;
     }
+
+    isSameMajorMinor(other) {
+        return this.major === other.major && this.minor === other.minor;
+    }
 }
 
 function _nextGa(v, generation) {
@@ -153,7 +157,7 @@ function _nextMilestoneDate(version, generation) {
 }
 
 function _nextSnapshot(version) {
-    if (version.classifier === "SNAPSHOT") {
+    if (version.ga) {
         return new Version(`${version.major}.${version.minor}.${version.patch + 1}-SNAPSHOT`);
     }
     return new Version(`${version.major}.${version.minor}.${version.patch}-SNAPSHOT`);
