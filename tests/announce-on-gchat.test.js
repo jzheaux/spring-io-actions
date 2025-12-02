@@ -13,11 +13,13 @@ describe('announce-on-gchat', () => {
 	});
 
 	it('announces a release', async () => {
-		inputs = {
+		Inputs.mockImplementation(() => ({
 			webhookUrl: 'https://example.com',
-			projectVersion: '1.2.3'
-        };
-        Inputs.mockImplementation(() => inputs);
+			projectVersion: '1.2.3',
+			get projectName() {
+				return process.env.GITHUB_REPOSITORY.split('/')[1];
+			}
+		}));
 		await run();
 		expect(Announce.prototype.constructor).toHaveBeenCalledWith('https://example.com', 'repo');
 		expect(Announce.prototype.announceRelease).toHaveBeenCalledWith('1.2.3');

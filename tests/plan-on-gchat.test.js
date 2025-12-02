@@ -13,12 +13,14 @@ describe('plan-on-gchat', () => {
 	});
 
 	it('plans a release', async () => {
-		inputs = {
+		Inputs.mockImplementation(() => ({
 			webhookUrl: 'https://example.com',
 			milestoneTitle: 'title',
-			milestoneDate: '2025-12-25'
-        };
-        Inputs.mockImplementation(() => inputs);
+			milestoneDate: '2025-12-25',
+			get projectName() {
+				return process.env.GITHUB_REPOSITORY.split('/')[1];
+			}
+		}));
 		await run();
 		expect(Announce.prototype.constructor).toHaveBeenCalledWith('https://example.com', 'repo');
 		expect(Announce.prototype.planRelease).toHaveBeenCalledWith('title', '2025-12-25');
