@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { Announce } = require('../src/gchat');
+const { Announce } = require('../src/announce');
 
 jest.mock('axios');
 

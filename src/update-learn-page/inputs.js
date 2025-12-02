@@ -55,6 +55,10 @@ class Inputs {
     get version() {
         return this._version;
     }
+
+    get commercial() {
+        return this.projectName.includes("commercial");
+    }
 }
 
 module.exports = {

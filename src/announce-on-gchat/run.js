@@ -1,6 +1,6 @@
 const core = require('@actions/core');
 const { Inputs } = require('./inputs');
-const { Announce } = require('../gchat');
+const { Announce } = require('../announce');
 
 async function run() {
     const inputs = new Inputs();

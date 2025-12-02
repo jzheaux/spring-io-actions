@@ -1,10 +1,10 @@
 const core = require('@actions/core');
 const { Inputs } = require('../src/announce-on-gchat/inputs');
-const { Announce } = require('../src/gchat');
+const { Announce } = require('../src/announce');
 const { run } = require('../src/announce-on-gchat/run');
 
 jest.mock('@actions/core');
-jest.mock('../src/gchat');
+jest.mock('../src/announce');
 jest.mock('../src/announce-on-gchat/inputs');
 
 describe('announce-on-gchat', () => {

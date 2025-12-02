@@ -35,11 +35,16 @@ async function run() {
     const apiDocUrl = inputs.apiDocUrl.replace(/{project}|{slug}/g, inputs.projectSlug);
 
     const latestEntry = new Entry(version, inputs.isAntora, refDocUrl, apiDocUrl);
-    const snapshot = version.nextSnapshot();
-    const snapshotEntry = new Entry(snapshot, inputs.isAntora, refDocUrl, apiDocUrl);
 
-    const filtered = learnPage.entries.filter(e => !e.version.isSameMajorMinor(version));
-    learnPage.entries = [latestEntry, snapshotEntry, ...filtered];
+    if (inputs.commercial) {
+        learnPage.entries = [latestEntry, ...learnPage.entries];
+    } else {
+        const snapshot = version.nextSnapshot();
+        const snapshotEntry = new Entry(snapshot, inputs.isAntora, refDocUrl, apiDocUrl);
+
+        const filtered = learnPage.entries.filter(e => !e.version.isSameMajorMinor(version));
+        learnPage.entries = [latestEntry, snapshotEntry, ...filtered];
+    }
 
     const updatedContent = Buffer.from(learnPage.toString()).toString('base64');
     const message = `Update #learn Page for ${inputs.projectName} ${inputs.version}`;
