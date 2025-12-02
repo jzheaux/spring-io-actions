@@ -1,0 +1,88 @@
+name: Perform Release
+
+on:
+  workflow_call:
+    secrets:
+      WEBSITE_TOKEN:
+        required: true
+      WIDGETS_TOKEN:
+        required: true
+      GCHAT_WEBHOOK_URL:
+        required: true
+
+env:
+  GITHUB_REPOSITORY: 'jzheaux/spring-widgets'
+  WEBSITE_REPOSITORY: 'jzheaux/jzheaux-website-content'
+
+jobs:
+  perform-release:
+    name: Perform Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.WIDGETS_TOKEN }}
+      - id: project-version
+        name: Extract Project Version
+        uses: jzheaux/spring-io-actions/compute-version@main
+      - uses: jzheaux/spring-io-actions/update-learn-page@main
+        if: ${{ !steps.project-version.outputs.snapshot }}
+        with:
+          website-token: ${{ secrets.WEBSITE_TOKEN }}
+          website-repository: ${{ env.WEBSITE_REPOSITORY }}
+          version: ${{ steps.project-version.outputs.version }}
+      - name: Generate Changelog
+        uses: spring-io/github-changelog-generator@v0.0.12
+        if: ${{ !steps.project-version.outputs.snapshot }}
+        with:
+          milestone: ${{ steps.project-version.outputs.version }}
+          token: ${{ secrets.WIDGETS_TOKEN }}
+          config-file: scripts/release/release-notes-config.yml
+      - name: Update Version
+        uses: jzheaux/spring-io-actions/push-next-development-version@main
+        if: ${{ !steps.project-version.outputs.snapshot }}
+        with:
+          version: ${{ steps.project-version.outputs.version }}
+      - name: Announce Release on GChat
+        uses: jzheaux/spring-io-actions/announce-on-gchat@main
+        if: ${{ !steps.project-version.outputs.snapshot }}
+        with:
+          project-version: ${{ steps.project-version.outputs.version }}
+          gchat-webhook-url: ${{ secrets.GCHAT_WEBHOOK_URL }}
+      - name: Close Release Milestone
+        uses: jzheaux/spring-io-actions/close-milestone@main
+        if: ${{ !steps.project-version.outputs.snapshot }}
+        with:
+          milestone-title: ${{ steps.project-version.outputs.version }}
+          repository-token: ${{ secrets.WIDGETS_TOKEN }}
+      - id: next-release-milestone
+        uses: jzheaux/spring-io-actions/compute-next-version@main
+        if: ${{ !steps.project-version.outputs.snapshot }}
+        with:
+          current-version: ${{ steps.project-version.outputs.version }}
+          milestone-token: ${{ secrets.WIDGETS_TOKEN }}
+          website-token: ${{ secrets.WEBSITE_TOKEN }}
+      - name: Ensure Next Release Scheduled
+        uses: jzheaux/spring-io-actions/schedule-milestone@main
+        if: ${{ steps.next-release-milestone.outputs.release-type  == 'oss' }}
+        with:
+          milestone-title: ${{ steps.next-release-milestone.outputs.release-title }}
+          milestone-date: ${{ steps.next-release-milestone.outputs.release-date }}
+          repository-token: ${{ secrets.WIDGETS_TOKEN }}
+          website-token: ${{ secrets.WEBSITE_TOKEN }}
+      - id: next-next-release-milestone
+        uses: jzheaux/spring-io-actions/compute-next-version@main
+        if: ${{ steps.next-release-milestone.outputs.release-type  == 'oss' }}
+        with:
+          current-version: ${{ steps.next-release-milestone.outputs.release-title }}
+          milestone-token: ${{ secrets.WIDGETS_TOKEN }}
+          website-token: ${{ secrets.WEBSITE_TOKEN }}
+      - name: Ensure Next Next Release Scheduled
+        uses: jzheaux/spring-io-actions/schedule-milestone@main
+        if: ${{ steps.next-next-release-milestone.outputs.release-type  == 'oss' }}
+        with:
+          milestone-title: ${{ steps.next-next-release-milestone.outputs.release-title }}
+          milestone-date: ${{ steps.next-next-release-milestone.outputs.release-date }}
+          repository-token: ${{ secrets.WIDGETS_TOKEN }}
+          website-token: ${{ secrets.WEBSITE_TOKEN }}
