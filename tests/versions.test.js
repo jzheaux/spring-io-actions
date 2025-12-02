@@ -88,4 +88,16 @@ describe('version', () => {
         expect(next.dueDate.getMonth()).toBe(1); // commercial releases are Feb, May, Aug, Nov
         expect(next.dueDate.getDate()).toBe(22);
     });
+
+    it('should calculate the next snapshot for a GA release', () => {
+        const v = new Version('1.2.3');
+        const next = v.nextSnapshot();
+        expect(next.toString()).toBe('1.2.4-SNAPSHOT');
+    });
+
+    it('should calculate the next snapshot for a pre-release', () => {
+        const v = new Version('1.2.3-M1');
+        const next = v.nextSnapshot();
+        expect(next.toString()).toBe('1.2.3-SNAPSHOT');
+    });
 });

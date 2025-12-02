@@ -1,231 +1,79 @@
-const fs = require('fs');
-const path = require('path');
 const core = require('@actions/core');
-const {
-    fromVersion,
-    nextSnapshot,
-    isSameMajorMinor,
-    markCurrent,
-    syncReleases,
-    main
-} = require('../src/update-learn-page/index');
+const { Octokit } = require('octokit');
+const { Inputs } = require('../update-learn-page/inputs');
+const { run } = require('../src/update-learn-page/run');
 
 jest.mock('@actions/core');
+jest.mock('octokit');
+jest.mock('../update-learn-page/inputs');
 
-describe('Release Script', () => {
+describe('Update Learn Page Action', () => {
+    let inputs;
+    let octokit;
 
-    describe('fromVersion', () => {
-        it('should create a GENERAL_AVAILABILITY release', () => {
-            const release = fromVersion("1.2.3", true, "ref-url", "api-url");
-            expect(release).toEqual({
-                version: "1.2.3",
-                isAntora: true,
-                referenceDocUrl: "ref-url",
-                apiDocUrl: "api-url",
-                status: "GENERAL_AVAILABILITY"
-            });
-        });
-
-        it('should create a PRERELEASE release', () => {
-            const release = fromVersion("1.2.3-RC1", true, "ref-url", "api-url");
-            expect(release).toEqual({
-                version: "1.2.3-RC1",
-                isAntora: true,
-                referenceDocUrl: "ref-url",
-                apiDocUrl: "api-url",
-                status: "PRERELEASE"
-            });
-        });
-
-        it('should create a SNAPSHOT release', () => {
-            const release = fromVersion("1.2.3-SNAPSHOT", true, "ref-url", "api-url");
-            expect(release).toEqual({
-                version: "1.2.3-SNAPSHOT",
-                isAntora: true,
-                referenceDocUrl: "ref-url",
-                apiDocUrl: "api-url",
-                status: "SNAPSHOT"
-            });
-        });
+    beforeEach(() => {
+        inputs = {
+            githubToken: 'token',
+            version: '1.2.3',
+            projectName: 'spring-projects/spring-boot',
+            websiteRepository: 'spring-io/spring-website-content',
+            projectSlug: 'spring-boot',
+            refDocUrl: 'https://docs.spring.io/spring-boot/reference/{version}/index.html',
+            apiDocUrl: 'https://docs.spring.io/spring-boot/site/docs/{version}/api/',
+            isAntora: true
+        };
+        Inputs.mockImplementation(() => inputs);
+        octokit = {
+            repos: {
+                getContent: jest.fn(),
+                createOrUpdateFileContents: jest.fn()
+            }
+        };
+        Octokit.mockImplementation(() => octokit);
     });
 
-    describe('nextSnapshot', () => {
-        it('should create the next snapshot version', () => {
-            const release = fromVersion("1.2.3", true, "ref-url", "api-url");
-            const snapshot = nextSnapshot(release, "ref-url-{version}", "api-url-{version}");
-            expect(snapshot).toEqual({
-                version: "1.2.4-SNAPSHOT",
-                isAntora: true,
-                referenceDocUrl: "ref-url-{version}",
-                apiDocUrl: "api-url-{version}",
-                status: "SNAPSHOT"
-            });
-        });
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
-    describe('isSameMajorMinor', () => {
-        it('should return true for same major and minor versions', () => {
-            const release1 = { version: "1.2.3" };
-            const release2 = { version: "1.2.4" };
-            expect(isSameMajorMinor(release1, release2)).toBe(true);
-        });
-
-        it('should return false for different major versions', () => {
-            const release1 = { version: "1.2.3" };
-            const release2 = { version: "2.2.3" };
-            expect(isSameMajorMinor(release1, release2)).toBe(false);
-        });
-
-        it('should return false for different minor versions', () => {
-            const release1 = { version: "1.2.3" };
-            const release2 = { version: "1.3.3" };
-            expect(isSameMajorMinor(release1, release2)).toBe(false);
-        });
+    it('should fail if the version is a SNAPSHOT', async () => {
+        inputs.version = '1.2.3-SNAPSHOT';
+        await run();
+        expect(core.setFailed).toHaveBeenCalledWith("Please specify a non-SNAPSHOT release version to publish; it's accompanying SNAPSHOT version will also be published");
     });
 
-    describe('markCurrent', () => {
-        it('should mark the latest GA release as current', () => {
-            const releases = [
-                { version: "1.2.3", status: "GENERAL_AVAILABILITY" },
-                { version: "1.2.2", status: "GENERAL_AVAILABILITY" },
-                { version: "1.3.0-SNAPSHOT", status: "SNAPSHOT" }
-            ];
-            const marked = markCurrent(releases);
-            expect(marked).toEqual([
-                { version: "1.2.3", status: "GENERAL_AVAILABILITY", current: true },
-                { version: "1.2.2", status: "GENERAL_AVAILABILITY", current: false },
-                { version: "1.3.0-SNAPSHOT", status: "SNAPSHOT", current: false }
-            ]);
-        });
+    it('should create a new documentation file', async () => {
+        octokit.repos.getContent.mockRejectedValue({ status: 404 });
+        await run();
+        expect(octokit.repos.createOrUpdateFileContents).toHaveBeenCalled();
+        const call = octokit.repos.createOrUpdateFileContents.mock.calls[0][0];
+        expect(call.owner).toBe('spring-io');
+        expect(call.repo).toBe('spring-website-content');
+        expect(call.path).toBe('project/spring-boot/documentation.json');
+        const content = JSON.parse(Buffer.from(call.content, 'base64').toString());
+        expect(content.length).toBe(2);
+        expect(content[0].version).toBe('1.2.4-SNAPSHOT');
+        expect(content[1].version).toBe('1.2.3');
+        expect(content[1].referenceDocUrl).toBe('https://docs.spring.io/spring-boot/reference/{version}/index.html');
     });
 
-    describe('syncReleases', () => {
-        const documentationPath = path.join(__dirname, 'documentation.json');
-
-        beforeEach(() => {
-            if (fs.existsSync(documentationPath)) {
-                fs.unlinkSync(documentationPath);
+    it('should update an existing documentation file', async () => {
+        const existing = [
+            {
+                version: '1.1.0',
+                status: 'GENERAL_AVAILABILITY',
+                current: true
             }
-        });
-
-        afterEach(() => {
-            if (fs.existsSync(documentationPath)) {
-                fs.unlinkSync(documentationPath);
-            }
-        });
-
-        it('should create a new documentation.json file with the latest release and snapshot', () => {
-            const latestRelease = fromVersion("2.0.0", true, "ref-{version}", "api-{version}");
-            syncReleases(latestRelease, documentationPath, "ref-{version}", "api-{version}");
-
-            const content = JSON.parse(fs.readFileSync(documentationPath, 'utf-8'));
-            expect(content).toEqual([
-                {
-                    version: "2.0.1-SNAPSHOT",
-                    isAntora: true,
-                    referenceDocUrl: "ref-{version}",
-                    apiDocUrl: "api-{version}",
-                    status: "SNAPSHOT",
-                    current: false
-                },
-                {
-                    version: "2.0.0",
-                    isAntora: true,
-                    referenceDocUrl: "ref-{version}",
-                    apiDocUrl: "api-{version}",
-                    status: "GENERAL_AVAILABILITY",
-                    current: true
-                }
-            ]);
-        });
-
-        it('should update an existing documentation.json file', () => {
-            const existingReleases = [
-                { version: "1.0.0", status: "GENERAL_AVAILABILITY", current: true }
-            ];
-            fs.writeFileSync(documentationPath, JSON.stringify(existingReleases, null, 2));
-
-            const latestRelease = fromVersion("2.0.0", true, "ref-{version}", "api-{version}");
-            syncReleases(latestRelease, documentationPath, "ref-{version}", "api-{version}");
-
-            const content = JSON.parse(fs.readFileSync(documentationPath, 'utf-8'));
-            expect(content).toEqual([
-                {
-                    version: "2.0.1-SNAPSHOT",
-                    isAntora: true,
-                    referenceDocUrl: "ref-{version}",
-                    apiDocUrl: "api-{version}",
-                    status: "SNAPSHOT",
-                    current: false
-                },
-                {
-                    version: "2.0.0",
-                    isAntora: true,
-                    referenceDocUrl: "ref-{version}",
-                    apiDocUrl: "api-{version}",
-                    status: "GENERAL_AVAILABILITY",
-                    current: true
-                },
-                {
-                    version: "1.0.0",
-                    status: "GENERAL_AVAILABILITY",
-                    current: false
-                }
-            ]);
-        });
-    });
-
-    describe('main', () => {
-        const documentationPath = path.join('spring-website-content/project/my-project/documentation.json');
-        const documentationDir = path.dirname(documentationPath);
-
-        beforeEach(() => {
-            if (fs.existsSync(documentationPath)) {
-                fs.unlinkSync(documentationPath);
-            }
-            if (fs.existsSync(documentationDir)) {
-                fs.rmSync(documentationDir, { recursive: true, force: true });
-            }
-        });
-
-        afterEach(() => {
-            if (fs.existsSync(documentationPath)) {
-                fs.unlinkSync(documentationPath);
-            }
-            if (fs.existsSync(documentationDir)) {
-                fs.rmSync(documentationDir, { recursive: true, force: true });
-            }
-            jest.clearAllMocks();
-        });
-
-        it('should call syncReleases with the correct parameters', () => {
-            core.getInput.mockReturnValueOnce("1.2.3") // version
-                         .mockReturnValueOnce("my-project") // project-slug
-                         .mockReturnValueOnce("https://docs.spring.io/{slug}/reference/{version}/index.html") // ref-doc-url
-                         .mockReturnValueOnce("https://docs.spring.io/{slug}/docs/{version}/javadoc-api"); // api-doc-url
-            core.getBooleanInput.mockReturnValueOnce(true); // is-antora
-
-            main();
-
-            const content = JSON.parse(fs.readFileSync(documentationPath, 'utf-8'));
-            expect(content).toEqual([
-                {
-                    version: "1.2.4-SNAPSHOT",
-                    isAntora: true,
-                    referenceDocUrl: "https://docs.spring.io/my-project/reference/{version}/index.html",
-                    apiDocUrl: "https://docs.spring.io/my-project/docs/{version}/javadoc-api",
-                    status: "SNAPSHOT",
-                    current: false
-                },
-                {
-                    version: "1.2.3",
-                    isAntora: true,
-                    referenceDocUrl: "https://docs.spring.io/my-project/reference/{version}/index.html",
-                    apiDocUrl: "https://docs.spring.io/my-project/docs/{version}/javadoc-api",
-                    status: "GENERAL_AVAILABILITY",
-                    current: true
-                }
-            ]);
-        });
+        ];
+        const existingContent = Buffer.from(JSON.stringify(existing)).toString('base64');
+        octokit.repos.getContent.mockResolvedValue({ data: { content: existingContent, sha: 'sha' } });
+        await run();
+        expect(octokit.repos.createOrUpdateFileContents).toHaveBeenCalled();
+        const call = octokit.repos.createOrUpdateFileContents.mock.calls[0][0];
+        const content = JSON.parse(Buffer.from(call.content, 'base64').toString());
+        expect(content.length).toBe(3);
+        expect(content[0].version).toBe('1.2.4-SNAPSHOT');
+        expect(content[1].version).toBe('1.2.3');
+        expect(content[2].version).toBe('1.1.0');
     });
 });

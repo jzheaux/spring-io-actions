@@ -1,4 +1,4 @@
-name: "learn-page-update-action"
+name: "Update Learn Page"
 description: "Update #learn Page on Spring OSS and Commercial Websites"
 author: "jzheaux"
 inputs:
@@ -12,7 +12,6 @@ inputs:
   website-repository:
     description: "The Spring Website GitHub repo from which to checkout documentation files"
     required: false
-    default: ''
   is-antora:
     description: "Whether the reference documentation is Antora-based; defaults to true"
     default: "true"
@@ -25,54 +24,8 @@ inputs:
     default: "https://docs.spring.io/{project}/reference/{version}/index.html"
     required: false
   version:
-    description: "The current GA version; will read gradle.properties or pom.xml if not provided"
-    required: false
-    default: ''
-
+    description: "The current GA version"
+    required: true
 runs:
-  using: 'composite'
-  steps:
-    - uses: actions/checkout@v5
-    - name: Install Dependencies
-      shell: bash
-      run: npm install
-    - name: Compute Spring Website Content Repository
-      id: compute-repo
-      if: ${{ inputs.website-repository == '' }}
-      uses: ./src/main/actions/switch-on-commercial
-      with:
-        if-oss: spring-io/spring-website-content
-        if-commercial: spring-io/spring-website-commercial-content
-    - name: Checkout Website Content Documentation File
-      uses: actions/checkout@v5
-      with:
-        repository: ${{ inputs.website-repository || steps.compute-repo.outputs.result }}
-        token: ${{ inputs.github-token }}
-        path: spring-website-content
-        sparse-checkout: |
-          project
-    - name: Compute Documentation Slug
-      id: documentation-slug
-      uses: ./src/main/actions/compute-slug
-      with:
-        project-name: ${{ inputs.project-name || github.repository }}
-    - name: Compute Version
-      id: compute-version
-      if: ${{ inputs.version == '' }}
-      uses: ./src/main/actions/compute-version
-    - name: Update Documentation File
-      uses: ./src/main/actions/update-documentation-file
-      with:
-        github-token: ${{ inputs.github-token }}
-        project-slug: ${{ steps.documentation-slug.outputs.slug }}
-        version: ${{ inputs.version || steps.compute-version.outputs.version }}
-        api-doc-url: ${{ inputs.api-doc-url }}
-        ref-doc-url: ${{ inputs.ref-doc-url }}
-        is-antora: ${{ inputs.is-antora }}
-    - name: Commit documentation updates
-      uses: stefanzweifel/git-auto-commit-action@v7
-      with:
-        repository: spring-website-content
-        commit_message: "Update #learn Page for ${{ github.repository }} ${{ inputs.version || steps.compute-version.outputs.version }}"
-        branch: main
-        file_pattern: project/**
+  using: "node20"
+  main: "index.js"
