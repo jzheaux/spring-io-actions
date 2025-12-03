@@ -38,11 +38,14 @@ jobs:
           repository: ${{ env.WIDGETS_REPOSITORY }}
           token: ${{ secrets.WIDGETS_TOKEN }}
           config-file: scripts/release/release-notes-sections.yml
-      - name: Update Version
-        uses: jzheaux/spring-io-actions/push-next-development-version@main
-        if: ${{ steps.project-version.outputs.snapshot == 'false' }}
-        with:
-          version: ${{ steps.project-version.outputs.version }}
+      - name: GitHub Release
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git tag ${{ steps.project-version.outputs.version }}
+          git push --tags origin
+          RELEASE_URL=$(gh release create ${{ steps.project-version.outputs.version }} -F changelog.md ${{ (contains(steps.project-version.outputs.version, '-M') || contains(steps.project-version.outputs.version, '-RC')) && '--prerelease' || '' }})
+          echo "::notice title=Release Page::$RELEASE_URL"
       - name: Announce Release on GChat
         uses: jzheaux/spring-io-actions/announce-on-gchat@main
         if: ${{ steps.project-version.outputs.snapshot == 'false' }}
@@ -54,7 +57,7 @@ jobs:
         if: ${{ steps.project-version.outputs.snapshot == 'false' }}
         with:
           milestone-title: ${{ steps.project-version.outputs.version }}
-          repository-name: ${{ env.GITHUB_REPOSITORY }}
+          repository-name: ${{ env.WIDGETS_REPOSITORY }}
           repository-token: ${{ secrets.WIDGETS_TOKEN }}
       - id: next-release-milestone
         uses: jzheaux/spring-io-actions/compute-next-version@main
@@ -90,3 +93,8 @@ jobs:
           milestone-date: ${{ steps.next-next-release-milestone.outputs.release-date }}
           repository-token: ${{ secrets.WIDGETS_TOKEN }}
           website-token: ${{ secrets.WEBSITE_TOKEN }}
+      - name: Update Version
+        uses: jzheaux/spring-io-actions/push-next-development-version@main
+        if: ${{ steps.project-version.outputs.snapshot == 'false' }}
+        with:
+          version: ${{ steps.project-version.outputs.version }}
