@@ -37,7 +37,7 @@ jobs:
           milestone: ${{ steps.project-version.outputs.version }}
           repository: ${{ env.WIDGETS_REPOSITORY }}
           token: ${{ secrets.WIDGETS_TOKEN }}
-          config-file: scripts/release/release-notes-config.yml
+          config-file: scripts/release/release-notes-sections.yml
       - name: Update Version
         uses: jzheaux/spring-io-actions/push-next-development-version@main
         if: ${{ steps.project-version.outputs.snapshot == 'false' }}
