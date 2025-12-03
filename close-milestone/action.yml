@@ -5,6 +5,12 @@ inputs:
   milestone-title:
     description: "The milestone to close"
     required: true
+  repository-token:
+    description: "The repository token with permissions to close milestones"
+    required: true
+  repository-name:
+    description: "The repository containing the milestone; uses the current repository by default"
+    required: false
 runs:
   using: "node20"
   main: "index.js"

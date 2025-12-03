@@ -6,7 +6,7 @@ const { Website } = require('../website');
 const { Version } = require('../versions');
 
 const inputs = new Inputs();
-const milestones = new Milestones(inputs.milestonesToken);
+const milestones = new Milestones(inputs.milestonesToken, process.env.GITHUB_REPOSITORY);
 const projects = new Website(inputs);
 
 async function run() {

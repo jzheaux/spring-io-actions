@@ -6,8 +6,9 @@ async function run() {
     const milestoneTitle = core.getInput('milestone-title');
     const milestoneDate = core.getInput('milestone-date');
     const milestoneDescription = core.getInput('milestone-description');
-    const token = process.env.GITHUB_TOKEN;
-    const milestones = new Milestones(token);
+    const repositoryName = core.getInput('repository-name') || process.env.GITHUB_REPOSITORY;
+    const token = core.getInput('repository-token') || process.env.GITHUB_TOKEN;
+    const milestones = new Milestones(token, repositoryName);
     await milestones.scheduleMilestone(milestoneTitle, milestoneDate, milestoneDescription);
   } catch (error) {
     core.setFailed(error.message);

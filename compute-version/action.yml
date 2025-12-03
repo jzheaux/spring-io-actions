@@ -5,6 +5,9 @@ outputs:
   version:
     description: "The version of the project"
     value: ${{ steps.compute-version.outputs.version }}
+  snapshot:
+    description: "Whether the version is a snapshot version"
+    value: ${{ steps.compute-version.outputs.snapshot }}
 runs:
   using: "composite"
   steps:
@@ -23,3 +26,8 @@ runs:
           CURRENT_VERSION=$(cat gradle.properties | sed -n '/^version=/ { s/^version=//;p }')
         fi
         echo version=$CURRENT_VERSION >> $GITHUB_OUTPUT
+        if [ $CURRENT_VERSION == *"-SNAPSHOT" ]; then
+          echo snapshot=true >> $GITHUB_OUTPUT
+        else
+          echo snapshot=false >> $GITHUB_OUTPUT
+        fi

@@ -4,8 +4,9 @@ const { Milestones } = require('../src/milestones');
 async function run() {
   try {
     const milestoneTitle = core.getInput('milestone-title');
-    const token = process.env.GITHUB_TOKEN;
-    const milestones = new Milestones(token);
+    const token = core.getInput('repository-token');
+    const repository = core.getInput('repository-name') || process.env.GITHUB_REPOSITORY;
+    const milestones = new Milestones(token, repository);
     await milestones.closeMilestone(milestoneTitle);
   } catch (error) {
     core.setFailed(error.message);

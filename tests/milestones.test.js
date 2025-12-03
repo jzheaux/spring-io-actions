@@ -22,7 +22,7 @@ describe('Milestones', () => {
 				}
 			};
 		});
-		milestones = new Milestones('token');
+		milestones = new Milestones('token', process.env.GITHUB_REPOSITORY);
 		jest.clearAllMocks();
 	});
 

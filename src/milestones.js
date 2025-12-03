@@ -8,10 +8,11 @@ const { Octokit } = require("octokit");
 class Milestones {
     /**
      * @param token the GH token needed to query milestones
+     * @param repo the GH repository to operate on
      */
-    constructor(token) {
+    constructor(token, repo) {
         this.octokit = new Octokit({ auth: token });
-        this.repo = process.env.GITHUB_REPOSITORY;
+        this.repo = repo;
         this.milestoneType = this.repo.endsWith("-commercial") ? "enterprise" : "oss";
     }
 
