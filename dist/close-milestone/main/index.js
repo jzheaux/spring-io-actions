@@ -42535,12 +42535,14 @@ class Milestones {
    * @returns {Promise<null | { number: number, name: string, dueDate: string | null }>}
    */
   async findMilestoneByName(title) {
+      console.log(`Looking up milestone ${title} in ${this.repo}`);
     const { data: milestones } = await this.octokit.rest.issues.listMilestones({
       repo: this.repo,
       state: "all",
       per_page: 100,
     });
 
+    console.log(`Found ${milestones}`)
     const m = milestones.find((m) => m.title === title);
     if (!m) {
       return null;
@@ -42555,7 +42557,6 @@ class Milestones {
   }
 
   async closeMilestone(title) {
-      console.log(`Looking up milestone ${title}`);
       const milestone = await this.findMilestoneByName(title);
     if (milestone) {
         console.log(`Found milestone ${title}; closing`)
