@@ -58,7 +58,7 @@ jobs:
           repository-token: ${{ secrets.WIDGETS_TOKEN }}
       - id: next-release-milestone
         uses: jzheaux/spring-io-actions/compute-next-version@main
-        if: ${{ steps.project-version.outputs.snapshot == false }}
+        if: ${{ steps.project-version.outputs.snapshot == "false" }}
         with:
           current-version: ${{ steps.project-version.outputs.version }}
           milestone-token: ${{ secrets.WIDGETS_TOKEN }}
