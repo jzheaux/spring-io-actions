@@ -8,6 +8,12 @@ inputs:
   website-token:
     description: "The GitHub token needed to query spring-website-content for generation information"
     required: true
+  website-repository:
+    description: "The GitHub repository for website content"
+    required: false
+  project-slug:
+    description: "The website content slug"
+    required: false
   milestone-token:
     description: "The GitHub token needed to query project milestone information"
     required: true

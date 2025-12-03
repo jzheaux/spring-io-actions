@@ -11,7 +11,7 @@ on:
         required: true
 
 env:
-  GITHUB_REPOSITORY: 'jzheaux/spring-widgets'
+  WIDGETS_REPOSITORY: 'jzheaux/spring-widgets'
   WEBSITE_REPOSITORY: 'jzheaux/jzheaux-website-content'
 
 jobs:
@@ -22,6 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          repository: ${{ env.WIDGETS_REPOSITORY }}
           token: ${{ secrets.WIDGETS_TOKEN }}
       - id: project-version
         name: Extract Project Version
@@ -37,6 +38,7 @@ jobs:
         if: ${{ !steps.project-version.outputs.snapshot }}
         with:
           milestone: ${{ steps.project-version.outputs.version }}
+          repository: ${{ env.WIDGETS_REPOSITORY }}
           token: ${{ secrets.WIDGETS_TOKEN }}
           config-file: scripts/release/release-notes-config.yml
       - name: Update Version
@@ -55,6 +57,7 @@ jobs:
         if: ${{ !steps.project-version.outputs.snapshot }}
         with:
           milestone-title: ${{ steps.project-version.outputs.version }}
+          repository-name: ${{ env.GITHUB_REPOSITORY }}
           repository-token: ${{ secrets.WIDGETS_TOKEN }}
       - id: next-release-milestone
         uses: jzheaux/spring-io-actions/compute-next-version@main
@@ -62,7 +65,9 @@ jobs:
         with:
           current-version: ${{ steps.project-version.outputs.version }}
           milestone-token: ${{ secrets.WIDGETS_TOKEN }}
+          website-repository: ${{ env.WEBSITE_REPOSITORY }}
           website-token: ${{ secrets.WEBSITE_TOKEN }}
+          project-slug: 'spring-widgets'
       - name: Ensure Next Release Scheduled
         uses: jzheaux/spring-io-actions/schedule-milestone@main
         if: ${{ steps.next-release-milestone.outputs.release-type  == 'oss' }}
@@ -77,7 +82,9 @@ jobs:
         with:
           current-version: ${{ steps.next-release-milestone.outputs.release-title }}
           milestone-token: ${{ secrets.WIDGETS_TOKEN }}
+          website-repository: ${{ env.WEBSITE_REPOSITORY }}
           website-token: ${{ secrets.WEBSITE_TOKEN }}
+          project-slug: 'spring-widgets'
       - name: Ensure Next Next Release Scheduled
         uses: jzheaux/spring-io-actions/schedule-milestone@main
         if: ${{ steps.next-next-release-milestone.outputs.release-type  == 'oss' }}
