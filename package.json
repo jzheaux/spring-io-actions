@@ -1,24 +1,39 @@
 {
-  "name": "releases-api-sync",
-  "version": "1.0.0",
-  "description": "Syncs releases with the documentation file",
-  "main": "src/main/javascript/index.js",
+  "name": "spring-io-actions",
+  "version": "0.0.1",
+  "description": "Release-related actions for Spring projects",
   "dependencies": {
     "@actions/core": "^1.11.1",
     "axios": "^1.13.2",
     "compare-versions": "^6.1.0",
     "js-base64": "^3.7.5",
     "minimist": "^1.2.6",
+    "npm-run-all": "4.1.5",
+    "patch-package": "8.0.1",
+    "prettier": "3.6.2",
     "octokit": "^3.1.0",
     "test": "^3.3.0"
   },
   "devDependencies": {
-    "esbuild": "^0.19.5",
-    "jest": "^29.7.0"
+    "jest": "^29.7.0",
+    "@vercel/ncc": "0.38.4"
   },
   "scripts": {
-    "build": "esbuild compute-next-version/index.js --bundle --platform=node --outfile=dist/compute-next-version/index.js",
+    "postinstall": "patch-package",
+    "prettier-write": "prettier --write 'src/**/*.js'",
+    "prettier-check": "prettier --check 'src/**/*.js'",
+    "compile-announce-on-gchat-main": "ncc build src/announce-on-gchat/index.js --out dist/announce-on-gchat/main --source-map --no-source-map-register",
+    "compile-close-milestone-main": "ncc build src/close-milestone/index.js --out dist/close-milestone/main --source-map --no-source-map-register",
+    "compile-compute-next-snapshot-main": "ncc build src/compute-next-snapshot/index.js --out dist/compute-next-snapshot/main --source-map --no-source-map-register",
+    "compile-compute-next-version-main": "ncc build src/compute-next-version/index.js --out dist/compute-next-version/main --source-map --no-source-map-register",
+    "compile-plan-on-gchat-main": "ncc build src/plan-on-gchat/index.js --out dist/plan-on-gchat/main --source-map --no-source-map-register",
+    "compile-schedule-milestone-main": "ncc build src/schedule-milestone/index.js --out dist/schedule-milestone/main --source-map --no-source-map-register",
+    "compile-update-learn-page-main": "ncc build src/update-learn-page/index.js --out dist/update-learn-page/main --source-map --no-source-map-register",
+    "compile": "npm-run-all --parallel compile-*",
+    "check": "npm-run-all --parallel prettier-check",
+    "format": "npm-run-all --parallel prettier-write",
     "test": "jest",
-    "main": "node src/main/javascript/index.js"
+    "build": "npm run format && npm run compile",
+    "all": "npm run build && npm test"
   }
 }

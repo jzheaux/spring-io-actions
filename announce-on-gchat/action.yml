@@ -13,4 +13,4 @@ inputs:
     required: false
 runs:
   using: "node20"
-  main: "index.js"
+  main: "../dist/announce-on-gchat/main/index.js"
