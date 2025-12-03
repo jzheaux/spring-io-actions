@@ -42555,14 +42555,17 @@ class Milestones {
   }
 
   async closeMilestone(title) {
-    const milestone = await this.findMilestoneByName(title);
+      console.log(`Looking up milestone ${title}`);
+      const milestone = await this.findMilestoneByName(title);
     if (milestone) {
-      await this.octokit.rest.issues.updateMilestone({
+        console.log(`Found milestone ${title}; closing`)
+        await this.octokit.rest.issues.updateMilestone({
         owner: this.repo.split("/")[0],
         repo: this.repo.split("/")[1],
         milestone_number: milestone.number,
         state: "closed",
       });
+        console.log(`Failed to find milestone ${title}`);
     }
   }
 
