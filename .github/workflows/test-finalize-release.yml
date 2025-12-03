@@ -25,14 +25,14 @@ jobs:
           echo "The version found was ${{ steps.project-version.outputs.version }}"
           echo "Is the version a snapshot? ${{ steps.project-version.outputs.snapshot }}"
       - uses: jzheaux/spring-io-actions/update-learn-page@main
-        if: ${{ !steps.project-version.outputs.snapshot }}
+        if: ${{ steps.project-version.outputs.snapshot == false }}
         with:
           website-token: ${{ secrets.WEBSITE_TOKEN }}
           website-repository: ${{ env.WEBSITE_REPOSITORY }}
           version: ${{ steps.project-version.outputs.version }}
       - name: Generate Changelog
         uses: spring-io/github-changelog-generator@v0.0.12
-        if: ${{ !steps.project-version.outputs.snapshot }}
+        if: ${{ steps.project-version.outputs.snapshot == false }}
         with:
           milestone: ${{ steps.project-version.outputs.version }}
           repository: ${{ env.WIDGETS_REPOSITORY }}
@@ -40,25 +40,25 @@ jobs:
           config-file: scripts/release/release-notes-config.yml
       - name: Update Version
         uses: jzheaux/spring-io-actions/push-next-development-version@main
-        if: ${{ !steps.project-version.outputs.snapshot }}
+        if: ${{ steps.project-version.outputs.snapshot == false }}
         with:
           version: ${{ steps.project-version.outputs.version }}
       - name: Announce Release on GChat
         uses: jzheaux/spring-io-actions/announce-on-gchat@main
-        if: ${{ !steps.project-version.outputs.snapshot }}
+        if: ${{ steps.project-version.outputs.snapshot == false }}
         with:
           project-version: ${{ steps.project-version.outputs.version }}
           gchat-webhook-url: ${{ secrets.GCHAT_WEBHOOK_URL }}
       - name: Close Release Milestone
         uses: jzheaux/spring-io-actions/close-milestone@main
-        if: ${{ !steps.project-version.outputs.snapshot }}
+        if: ${{ steps.project-version.outputs.snapshot == false }}
         with:
           milestone-title: ${{ steps.project-version.outputs.version }}
           repository-name: ${{ env.GITHUB_REPOSITORY }}
           repository-token: ${{ secrets.WIDGETS_TOKEN }}
       - id: next-release-milestone
         uses: jzheaux/spring-io-actions/compute-next-version@main
-        if: ${{ !steps.project-version.outputs.snapshot }}
+        if: ${{ steps.project-version.outputs.snapshot == false }}
         with:
           current-version: ${{ steps.project-version.outputs.version }}
           milestone-token: ${{ secrets.WIDGETS_TOKEN }}
