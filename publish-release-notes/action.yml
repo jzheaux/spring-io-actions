@@ -24,3 +24,4 @@ runs:
         then
         else
           gh release edit ${{ inputs.tag }} -F ${{ inputs.release-notes-location }} ${{ (contains(inputs.tag, '-M') || contains(inputs.tag, '-RC')) && '--prerelease' || '' }}
+        fi
