@@ -40,18 +40,15 @@ jobs:
           token: ${{ secrets.WIDGETS_TOKEN }}
           config-file: scripts/release/release-notes-sections.yml
       - name: GitHub Release
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git tag ${{ steps.project-version.outputs.version }}
-          git push --tags origin
-          RELEASE_URL=$(gh release create ${{ steps.project-version.outputs.version }} -F changelog.md ${{ (contains(steps.project-version.outputs.version, '-M') || contains(steps.project-version.outputs.version, '-RC')) && '--prerelease' || '' }})
-          echo "::notice title=Release Page::$RELEASE_URL"
+        uses: jzheaux/spring-io-actions/publish-release-notes@main
+        with:
+          tag: ${{ steps.project-version.outputs.version }}
       - name: Announce Release on GChat
         uses: jzheaux/spring-io-actions/announce-on-gchat@main
         if: ${{ steps.project-version.outputs.snapshot == 'false' }}
         with:
           project-version: ${{ steps.project-version.outputs.version }}
+          project-name: 'spring-widgets'
           gchat-webhook-url: ${{ secrets.GCHAT_WEBHOOK_URL }}
       - name: Close Release Milestone
         uses: jzheaux/spring-io-actions/close-milestone@main
