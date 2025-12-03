@@ -39,6 +39,8 @@ jobs:
           token: ${{ secrets.WIDGETS_TOKEN }}
           config-file: scripts/release/release-notes-sections.yml
       - name: GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.WIDGETS_TOKEN }}
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
