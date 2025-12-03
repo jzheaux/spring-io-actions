@@ -1,7 +1,7 @@
 const core = require('@actions/core');
 const { Octokit } = require('octokit');
 const { Inputs } = require('../src/update-learn-page/inputs');
-const { run } = require('../src/update-learn-page/run');
+const { run } = require('../src/update-learn-page');
 
 jest.mock('@actions/core');
 jest.mock('octokit');

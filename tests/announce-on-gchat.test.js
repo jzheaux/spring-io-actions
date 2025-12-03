@@ -1,7 +1,7 @@
 const core = require('@actions/core');
 const { Inputs } = require('../src/announce-on-gchat/inputs');
 const { Announce } = require('../src/announce');
-const { run } = require('../src/announce-on-gchat/run');
+const { run } = require('../src/announce-on-gchat');
 
 jest.mock('@actions/core');
 jest.mock('../src/announce');

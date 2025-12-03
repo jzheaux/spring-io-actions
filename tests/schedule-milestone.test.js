@@ -1,6 +1,6 @@
 const core = require('@actions/core');
 const { Milestones } = require('../src/milestones');
-const run = require('../schedule-milestone/index');
+const run = require('../src/schedule-milestone');
 
 jest.mock('@actions/core');
 jest.mock('../src/milestones');
