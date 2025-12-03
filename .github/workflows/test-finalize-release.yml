@@ -2,13 +2,6 @@ name: Perform Release
 
 on:
   workflow_dispatch:
-    secrets:
-      WEBSITE_TOKEN:
-        required: true
-      WIDGETS_TOKEN:
-        required: true
-      GCHAT_WEBHOOK_URL:
-        required: true
 
 env:
   WIDGETS_REPOSITORY: 'jzheaux/spring-widgets'
@@ -27,6 +20,8 @@ jobs:
       - id: project-version
         name: Extract Project Version
         uses: jzheaux/spring-io-actions/compute-version@main
+      - name: Verify calculated version
+        run: echo "The version found was ${{ steps.project-version.outputs.version }}"
       - uses: jzheaux/spring-io-actions/update-learn-page@main
         if: ${{ !steps.project-version.outputs.snapshot }}
         with:
