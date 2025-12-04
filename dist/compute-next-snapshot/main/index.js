@@ -25648,7 +25648,7 @@ module.exports = {
 
 const core = __nccwpck_require__(7484);
 
-const { Inputs } = __nccwpck_require__(9322);
+const { Inputs } = __nccwpck_require__(9681);
 const { Version } = __nccwpck_require__(6100);
 
 const inputs = new Inputs();
@@ -25663,8 +25663,31 @@ async function run() {
 if (require.main === require.cache[eval('__filename')]) {
   run();
 }
+
 module.exports = {
   run,
+};
+
+
+/***/ }),
+
+/***/ 9681:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const core = __nccwpck_require__(7484);
+
+class Inputs {
+  constructor() {
+    this._currentVersion = core.getInput("version", { required: true });
+  }
+
+  get currentVersion() {
+    return this._currentVersion;
+  }
+}
+
+module.exports = {
+  Inputs,
 };
 
 
@@ -25914,14 +25937,6 @@ function _nextSnapshot(version) {
 module.exports = {
   Version,
 };
-
-
-/***/ }),
-
-/***/ 9322:
-/***/ ((module) => {
-
-module.exports = eval("require")("inputs");
 
 
 /***/ }),
