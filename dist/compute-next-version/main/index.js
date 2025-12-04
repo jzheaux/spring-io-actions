@@ -1,4 +1,5 @@
-/******/ (() => { // webpackBootstrap
+/******/ const core = require("@actions/core");
+(() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 4914:
@@ -42802,7 +42803,7 @@ const { Version } = __nccwpck_require__(6100);
 const inputs = new Inputs();
 const milestones = new Milestones(
   inputs.milestonesToken,
-  process.env.GITHUB_REPOSITORY,
+    inputs.milestoneRepository,
 );
 const projects = new Website(inputs);
 
@@ -42887,7 +42888,9 @@ class Inputs {
     this._milestonesToken = core.getInput("milestone-token", {
       required: true,
     });
-    this._websiteToken = core.getInput("website-token", { required: true });
+      this._milestoneRepository = core.getInput("milestone-repository") || process.env.GITHUB_REPOSITORY;
+
+      this._websiteToken = core.getInput("website-token", { required: true });
     this._currentVersion = core.getInput("current-version", { required: true });
   }
 
@@ -42902,6 +42905,11 @@ class Inputs {
   get milestonesToken() {
     return this._milestonesToken;
   }
+
+
+    get milestoneRepository() {
+        return this._milestoneRepository;
+    }
 
   get websiteToken() {
     return this._websiteToken;

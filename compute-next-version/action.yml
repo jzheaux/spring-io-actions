@@ -14,6 +14,9 @@ inputs:
   project-slug:
     description: "The website content slug"
     required: false
+  milestone-repository:
+    description: "The GitHub repository to query project milestone information"
+    required: false
   milestone-token:
     description: "The GitHub token needed to query project milestone information"
     required: true

@@ -8,7 +8,7 @@ const { Version } = require("../versions");
 const inputs = new Inputs();
 const milestones = new Milestones(
   inputs.milestonesToken,
-  process.env.GITHUB_REPOSITORY,
+  inputs.milestoneRepository,
 );
 const projects = new Website(inputs);
 

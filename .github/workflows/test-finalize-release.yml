@@ -66,6 +66,7 @@ jobs:
         with:
           current-version: ${{ steps.project-version.outputs.version }}
           milestone-token: ${{ secrets.WIDGETS_TOKEN }}
+          milestone-repository: ${{ env.WIDGETS_REPOSITORY }}
           website-repository: ${{ env.WEBSITE_REPOSITORY }}
           website-token: ${{ secrets.WEBSITE_TOKEN }}
           project-slug: 'spring-widgets'
@@ -75,14 +76,15 @@ jobs:
         with:
           milestone-title: ${{ steps.next-release-milestone.outputs.release-title }}
           milestone-date: ${{ steps.next-release-milestone.outputs.release-date }}
+          repository-name: ${{ env.WIDGETS_REPOSITORY }}
           repository-token: ${{ secrets.WIDGETS_TOKEN }}
-          website-token: ${{ secrets.WEBSITE_TOKEN }}
       - id: next-next-release-milestone
         uses: jzheaux/spring-io-actions/compute-next-version@main
         if: ${{ steps.next-release-milestone.outputs.release-type  == 'oss' }}
         with:
           current-version: ${{ steps.next-release-milestone.outputs.release-title }}
           milestone-token: ${{ secrets.WIDGETS_TOKEN }}
+          milestone-repository: ${{ env.WIDGETS_REPOSITORY }}
           website-repository: ${{ env.WEBSITE_REPOSITORY }}
           website-token: ${{ secrets.WEBSITE_TOKEN }}
           project-slug: 'spring-widgets'
@@ -92,8 +94,8 @@ jobs:
         with:
           milestone-title: ${{ steps.next-next-release-milestone.outputs.release-title }}
           milestone-date: ${{ steps.next-next-release-milestone.outputs.release-date }}
+          repository-name: ${{ env.WIDGETS_REPOSITORY }}
           repository-token: ${{ secrets.WIDGETS_TOKEN }}
-          website-token: ${{ secrets.WEBSITE_TOKEN }}
       - name: Update Version
         uses: jzheaux/spring-io-actions/push-next-development-version@main
         if: ${{ steps.project-version.outputs.snapshot == 'false' }}
