@@ -32751,12 +32751,15 @@ async function run() {
     );
     return;
   }
-  core.setOutput("next-version", release.toString());
-  core.setOutput("next-version-type", release.type);
-  core.setOutput(
-    "next-version-date",
-    release.dueDate.toISOString().substring(0, 10),
+  const nextVersion = release.toString();
+  const nextVersionType = release.type;
+  const nextVersionDate = release.dueDate.toISOString().substring(0, 10);
+  console.log(
+    `Next version is ${nextVersion} (${nextVersionType}) on ${nextVersionDate}`,
   );
+  core.setOutput("next-version", nextVersion);
+  core.setOutput("next-version-type", nextVersionType);
+  core.setOutput("next-version-date", nextVersionDate);
 }
 
 async function _getVersion() {

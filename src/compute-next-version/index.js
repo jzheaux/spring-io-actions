@@ -36,10 +36,10 @@ async function run() {
   }
   const nextVersion = release.toString();
   const nextVersionType = release.type;
-  const nextVersionDate = release.dueDate
-    .toISOString()
-    .substring(0, 10);
-  console.log(`Next version is ${nextVersion} (${nextVersionType}) on ${nextVersionDate}`);
+  const nextVersionDate = release.dueDate.toISOString().substring(0, 10);
+  console.log(
+    `Next version is ${nextVersion} (${nextVersionType}) on ${nextVersionDate}`,
+  );
   core.setOutput("next-version", nextVersion);
   core.setOutput("next-version-type", nextVersionType);
   core.setOutput("next-version-date", nextVersionDate);
