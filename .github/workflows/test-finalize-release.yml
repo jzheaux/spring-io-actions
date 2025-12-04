@@ -74,17 +74,17 @@ jobs:
           project-slug: 'spring-widgets'
       - name: Ensure Next Release Scheduled
         uses: jzheaux/spring-io-actions/schedule-milestone@main
-        if: ${{ steps.next-release-milestone.outputs.release-type  == 'oss' }}
+        if: ${{ steps.next-release-milestone.outputs.next-version-type  == 'oss' }}
         with:
-          milestone-title: ${{ steps.next-release-milestone.outputs.release-title }}
-          milestone-date: ${{ steps.next-release-milestone.outputs.release-date }}
+          milestone-title: ${{ steps.next-release-milestone.outputs.next-version }}
+          milestone-date: ${{ steps.next-release-milestone.outputs.next-version-date }}
           repository-name: ${{ env.WIDGETS_REPOSITORY }}
           repository-token: ${{ secrets.WIDGETS_TOKEN }}
       - id: next-next-release-milestone
         uses: jzheaux/spring-io-actions/compute-next-version@main
-        if: ${{ steps.next-release-milestone.outputs.release-type  == 'oss' }}
+        if: ${{ steps.next-release-milestone.outputs.next-version-type  == 'oss' }}
         with:
-          current-version: ${{ steps.next-release-milestone.outputs.release-title }}
+          current-version: ${{ steps.next-release-milestone.outputs.next-version }}
           milestone-token: ${{ secrets.WIDGETS_TOKEN }}
           milestone-repository: ${{ env.WIDGETS_REPOSITORY }}
           website-repository: ${{ env.WEBSITE_REPOSITORY }}
@@ -92,10 +92,10 @@ jobs:
           project-slug: 'spring-widgets'
       - name: Ensure Next Next Release Scheduled
         uses: jzheaux/spring-io-actions/schedule-milestone@main
-        if: ${{ steps.next-next-release-milestone.outputs.release-type  == 'oss' }}
+        if: ${{ steps.next-next-release-milestone.outputs.next-version-type  == 'oss' }}
         with:
-          milestone-title: ${{ steps.next-next-release-milestone.outputs.release-title }}
-          milestone-date: ${{ steps.next-next-release-milestone.outputs.release-date }}
+          milestone-title: ${{ steps.next-next-release-milestone.outputs.next-version }}
+          milestone-date: ${{ steps.next-next-release-milestone.outputs.next-version-date }}
           repository-name: ${{ env.WIDGETS_REPOSITORY }}
           repository-token: ${{ secrets.WIDGETS_TOKEN }}
       - name: Update Version

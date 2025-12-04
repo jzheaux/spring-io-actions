@@ -20,7 +20,13 @@ inputs:
   milestone-token:
     description: "The GitHub token needed to query project milestone information"
     required: true
-
+outputs:
+  next-version:
+    description: "The next project version"
+  next-version-type:
+    description: "The type of the next project version (e.g., 'oss', 'enterprise')"
+  next-version-date:
+    description: "The scheduled date for the next project version"
 runs:
   using: "node20"
   main: '../dist/compute-next-version/main/index.js'
