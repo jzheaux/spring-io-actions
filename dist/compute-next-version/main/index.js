@@ -43084,7 +43084,7 @@ class Version {
   }
 
   static fromMilestone(milestone) {
-    return new Version(milestone.title, milestone.dueDate, milestone.type);
+    return new Version(milestone.name, milestone.dueDate, milestone.type);
   }
 
   get version() {
