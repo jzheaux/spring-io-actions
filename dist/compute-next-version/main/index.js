@@ -43280,12 +43280,12 @@ class Website {
   }
 
   async getGenerationByVersion(version) {
-    const file = await _load(
-      this.gh,
-      this.repo.split("/")[0],
-      this.repo.split("/")[1],
-      `/project/${this.slug}/generations.json`,
-    );
+    const owner = this.repo.split("/")[0];
+    const repo = this.repo.split("/")[1];
+    const path = `/project/${this.slug}/generations.json`;
+    const ref = "main";
+    console.log(`Retrieving ${path} from ${owner}/${repo}@${ref}`);
+    const file = await _load(this.gh, owner, repo, path, ref);
     const asStrings = JSON.parse(file);
     const { dayOfWeek, weekOfMonth } = getWeekOfMonthAndDayOfWeek(
       version.dueDate,
@@ -43321,7 +43321,6 @@ class Website {
 
 async function _load(gh, owner, repo, path, ref = "main") {
   try {
-    console.log(`Retrieving ${path} from ${owner}/${repo}@${ref}`);
     const response = await gh.repos.getContent({
       owner,
       repo,
