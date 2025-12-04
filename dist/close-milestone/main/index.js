@@ -32492,12 +32492,13 @@ class Milestones {
 
   async scheduleMilestone(title, date, description) {
     const milestone = await this.findMilestoneByName(title);
+    const dueDate = new Date(date).toISOString();
     if (milestone) {
       await this.octokit.rest.issues.updateMilestone({
         owner: this.repo.split("/")[0],
         repo: this.repo.split("/")[1],
         milestone_number: milestone.number,
-        due_on: date,
+        due_on: dueDate,
         description: description,
       });
     } else {
@@ -32505,7 +32506,7 @@ class Milestones {
         owner: this.repo.split("/")[0],
         repo: this.repo.split("/")[1],
         title: title,
-        due_on: date,
+        due_on: dueDate,
         description: description,
       });
     }
