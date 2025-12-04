@@ -42844,13 +42844,14 @@ async function run() {
     );
     return;
   }
-  const octokit = new Octokit({ token: inputs.githubToken });
+  const octokit = new Octokit({ auth: inputs.websiteToken });
   const [owner, repo] = inputs.websiteRepository.split("/");
   const path = `project/${inputs.projectSlug}/documentation.json`;
   const ref = "main";
 
   let file;
   try {
+    console.log(`Retrieving ${path} from ${owner}/${repo}@${ref}`);
     const response = await octokit.repos.getContent({ owner, repo, path, ref });
     file = {
       content: Buffer.from(response.data.content, "base64").toString(),
