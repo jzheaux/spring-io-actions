@@ -14,7 +14,7 @@ class Website {
     const repo = this.repo.split("/")[1];
     const path = `/project/${this.slug}/generations.json`;
     const ref = "main";
-    console.log(`Retrieving ${path} from ${owner}/${repo}@${ref}`);
+    throw new Error(`Retrieving ${path} from ${owner}/${repo}@${ref}`);
     const file = await _load(this.gh, owner, repo, path, ref);
     const asStrings = JSON.parse(file);
     const { dayOfWeek, weekOfMonth } = getWeekOfMonthAndDayOfWeek(
