@@ -21,6 +21,9 @@ class Website {
       version.dueDate,
     );
     for (const generation of asStrings) {
+      console.log(
+        `Checking generation ${generation.generation} against ${version.major}.${version.minor}`,
+      );
       const majorMinor = _generation(generation.generation);
       if (
         majorMinor.major === version.major &&
