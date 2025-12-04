@@ -1,5 +1,5 @@
 const core = require("@actions/core");
-const { Octokit } = require("octokit");
+const { Octokit } = require("@octokit/rest");
 const { Inputs } = require("./inputs");
 const { Entry, LearnPage } = require("../learn");
 const { Version } = require("../versions");

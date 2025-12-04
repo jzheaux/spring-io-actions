@@ -1,4 +1,4 @@
-const { Octokit } = require("octokit");
+const { Octokit } = require("@octokit/rest");
 const { Base64 } = require("js-base64");
 const { getWeekOfMonthAndDayOfWeek } = require("./lib");
 

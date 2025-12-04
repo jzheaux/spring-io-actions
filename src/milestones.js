@@ -1,4 +1,4 @@
-const { Octokit } = require("octokit");
+const { Octokit } = require("@octokit/rest");
 /**
  * Helper for working with GitHub milestones via Octokit.
  *
