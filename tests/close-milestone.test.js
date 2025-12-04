@@ -1,9 +1,10 @@
 const core = require('@actions/core');
-const { Milestones } = require('../src/milestones');
 const run = require('../src/close-milestone');
 
 jest.mock('@actions/core');
 jest.mock('../src/milestones');
+
+const { Milestones } = require('../src/milestones');
 
 describe('close-milestone', () => {
 	it('closes a milestone', async () => {

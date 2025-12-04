@@ -78,6 +78,4 @@ if (require.main === module) {
   run();
 }
 
-module.exports = {
-  run,
-};
+module.exports = { run };

@@ -1,7 +1,8 @@
 const { Milestones } = require('../src/milestones');
-const { Octokit } = require('octokit');
 
-jest.mock('octokit');
+jest.mock('@octokit/rest');
+
+const { Octokit } = require('@octokit/rest');
 
 describe('Milestones', () => {
 	let milestones;

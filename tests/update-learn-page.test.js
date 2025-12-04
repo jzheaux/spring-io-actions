@@ -1,10 +1,11 @@
 const core = require('@actions/core');
-const { Octokit } = require('octokit');
-const { Inputs } = require('../src/update-learn-page/inputs');
+
 const { run } = require('../src/update-learn-page');
+const { Octokit } = require('@octokit/rest');
+const { Inputs } = require('../src/update-learn-page/inputs');
 
 jest.mock('@actions/core');
-jest.mock('octokit');
+jest.mock('@octokit/rest');
 jest.mock('../src/update-learn-page/inputs');
 
 describe('Update Learn Page Action', () => {
