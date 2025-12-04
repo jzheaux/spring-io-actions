@@ -1,0 +1,15 @@
+name: "compute-version"
+description: "An action that determines the project version"
+author: "jzheaux"
+inputs:
+  version:
+    description: "The current project version"
+    required: true
+outputs:
+  snapshot-version:
+    description: "The next snaphot version of the project"
+    value: ${{ steps.compute-version.outputs.version }}
+
+rruns:
+  using: "node20"
+  main: '../dist/compute-next-snapshot/main/index.js'

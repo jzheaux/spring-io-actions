@@ -9,10 +9,13 @@ inputs:
 runs:
   using: "composite"
   steps:
+  - name: Compute Next snapshot
+    id: compute-next-snapshot
+    uses: jzheaux/spring-io-actions/compute-next-snapshot@main
   - name: Push Next Development Version
     shell: bash
     env:
-      VERSION: ${{ inputs.version }}
+      VERSION: ${{ steps.compute-next-snapshot.outputs.snapshot-version }}
     run: |
       if test -f pom.xml
       then

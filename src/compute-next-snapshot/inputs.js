@@ -2,7 +2,7 @@ const core = require("@actions/core");
 
 class Inputs {
   constructor() {
-    this._currentVersion = core.getInput("current-version", { required: true });
+    this._currentVersion = core.getInput("version", { required: true });
   }
 
   get currentVersion() {
