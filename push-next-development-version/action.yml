@@ -12,6 +12,8 @@ runs:
   - name: Compute Next snapshot
     id: compute-next-snapshot
     uses: jzheaux/spring-io-actions/compute-next-snapshot@main
+    with:
+      version: ${{ inputs.version }}
   - name: Push Next Development Version
     shell: bash
     env:
