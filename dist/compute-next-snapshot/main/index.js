@@ -25657,7 +25657,7 @@ async function run() {
   const version = new Version(inputs.currentVersion);
   const next = version.nextSnapshot();
 
-  core.setOutput("snapshot-version", next.version());
+  core.setOutput("snapshot-version", next.version);
 }
 
 if (require.main === require.cache[eval('__filename')]) {
