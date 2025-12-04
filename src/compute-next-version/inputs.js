@@ -19,7 +19,8 @@ class Inputs {
     this._milestonesToken = core.getInput("milestone-token", {
       required: true,
     });
-    this._milestoneRepository = core.getInput("milestone-repository") || process.env.GITHUB_REPOSITORY;
+    this._milestoneRepository =
+      core.getInput("milestone-repository") || process.env.GITHUB_REPOSITORY;
     this._websiteToken = core.getInput("website-token", { required: true });
     this._currentVersion = core.getInput("current-version", { required: true });
   }
@@ -37,7 +38,7 @@ class Inputs {
   }
 
   get milestoneRepository() {
-      return this._milestoneRepository;
+    return this._milestoneRepository;
   }
 
   get websiteToken() {
