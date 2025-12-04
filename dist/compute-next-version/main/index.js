@@ -32917,7 +32917,7 @@ class Milestones {
    * Searches across all states (open + closed).
    *
    * @param {string} title
-   * @returns {Promise<null | { number: number, name: string, dueDate: string | null }>}
+   * @returns {Promise<null | { number: number, name: string, dueDate: Date | null }>}
    */
   async findMilestoneByName(title) {
     const { data: milestones } = await this.octokit.rest.issues.listMilestones({
@@ -32935,7 +32935,7 @@ class Milestones {
     return {
       number: m.number,
       name: m.title,
-      dueDate: m.due_on || null,
+      dueDate: m.due_on ? new Date(m.due_on) : null,
       type: this.milestoneType,
     };
   }
@@ -33214,6 +33214,9 @@ class Website {
       version.dueDate,
     );
     for (const generation of asStrings) {
+      console.log(
+        `Checking generation ${generation.generation} against ${version.major}.${version.minor}`,
+      );
       const majorMinor = _generation(generation.generation);
       if (
         majorMinor.major === version.major &&
