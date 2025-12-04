@@ -10,6 +10,6 @@ outputs:
     description: "The next snaphot version of the project"
     value: ${{ steps.compute-version.outputs.version }}
 
-rruns:
+runs:
   using: "node20"
   main: '../dist/compute-next-snapshot/main/index.js'
