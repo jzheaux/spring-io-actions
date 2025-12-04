@@ -42884,7 +42884,7 @@ class Inputs {
       projectSlug = repository.replace("-commercial", "");
     }
     this._projectSlug = projectSlug;
-    this._milestonesToken = core.getInput("milestones-token", {
+    this._milestonesToken = core.getInput("milestone-token", {
       required: true,
     });
     this._websiteToken = core.getInput("website-token", { required: true });
