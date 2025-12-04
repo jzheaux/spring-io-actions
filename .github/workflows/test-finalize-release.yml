@@ -46,6 +46,7 @@ jobs:
           config-file: scripts/release/release-notes-sections.yml
       - name: GitHub Release
         uses: jzheaux/spring-io-actions/publish-release-notes@main
+        if: ${{ steps.project-version.outputs.snapshot == 'false' }}
         with:
           tag: ${{ steps.project-version.outputs.version }}
       - name: Announce Release on GChat
