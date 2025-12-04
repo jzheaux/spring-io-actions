@@ -43321,6 +43321,7 @@ class Website {
 
 async function _load(gh, owner, repo, path, ref = "main") {
   try {
+    console.log(`Retrieving ${path} from ${owner}/${repo}@${ref}`);
     const response = await gh.repos.getContent({
       owner,
       repo,
