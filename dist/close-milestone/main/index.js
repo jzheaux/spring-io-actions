@@ -42537,7 +42537,8 @@ class Milestones {
   async findMilestoneByName(title) {
       console.log(`Looking up milestone ${title} in ${this.repo}`);
     const { data: milestones } = await this.octokit.rest.issues.listMilestones({
-      repo: this.repo,
+        owner: this.repo.split("/")[0],
+        repo: this.repo.split("/")[1],
       state: "all",
       per_page: 100,
     });
