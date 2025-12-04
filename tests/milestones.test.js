@@ -54,7 +54,7 @@ describe('Milestones', () => {
 				owner: 'owner',
 				repo: 'repo',
 				milestone_number: 1,
-				due_on: '2025-12-25',
+				due_on: '2025-12-25T00:00:00.000Z',
 				description: 'description'
 			});
 		});
@@ -66,7 +66,7 @@ describe('Milestones', () => {
 				owner: 'owner',
 				repo: 'repo',
 				title: 'title',
-				due_on: '2025-12-25',
+				due_on: '2025-12-25T00:00:00.000Z',
 				description: 'description'
 			});
 		});
