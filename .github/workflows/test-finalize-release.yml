@@ -35,7 +35,7 @@ jobs:
           website-token: ${{ secrets.WEBSITE_TOKEN }}
           website-repository: ${{ env.WEBSITE_REPOSITORY }}
           version: ${{ steps.project-version.outputs.version }}
-          project-slug: 'spring-widgets'
+          project-name: 'spring-widgets'
       - name: Generate Changelog
         uses: spring-io/github-changelog-generator@v0.0.12
         if: ${{ steps.project-version.outputs.snapshot == 'false' }}
