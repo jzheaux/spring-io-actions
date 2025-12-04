@@ -1,6 +1,6 @@
 const core = require("@actions/core");
 
-const { Inputs } = require("inputs");
+const { Inputs } = require("./inputs");
 const { Version } = require("../versions");
 
 const inputs = new Inputs();
@@ -15,6 +15,7 @@ async function run() {
 if (require.main === module) {
   run();
 }
+
 module.exports = {
   run,
 };
