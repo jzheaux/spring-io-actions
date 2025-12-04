@@ -33213,7 +33213,7 @@ class Website {
     const { dayOfWeek, weekOfMonth } = getWeekOfMonthAndDayOfWeek(
       version.dueDate,
     );
-    for (const generation of asStrings) {
+    for (const generation of asStrings.generations) {
       console.log(
         `Checking generation ${generation.generation} against ${version.major}.${version.minor}`,
       );
