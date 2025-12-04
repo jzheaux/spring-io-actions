@@ -12,7 +12,8 @@ class Website {
   async getGenerationByVersion(version) {
     const file = await _load(
       this.gh,
-      this.repo,
+      this.repo.split("/")[0],
+      this.repo.split("/")[1],
       `/project/${this.slug}/generations.json`,
     );
     const asStrings = JSON.parse(file);
@@ -48,11 +49,13 @@ class Website {
   }
 }
 
-async function _load(gh, repo, path) {
+async function _load(gh, owner, repo, path, ref = "main") {
   try {
-    const response = await gh.rest.repos.getContents({
+    const response = await gh.repos.getContent({
+      owner,
       repo,
       path,
+      ref,
     });
 
     // The content is returned in base64 encoding

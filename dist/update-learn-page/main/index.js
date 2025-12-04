@@ -42905,6 +42905,10 @@ async function run() {
   });
 }
 
+if (require.main === require.cache[eval('__filename')]) {
+  run();
+}
+
 module.exports = {
   run,
 };

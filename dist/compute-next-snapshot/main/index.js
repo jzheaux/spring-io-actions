@@ -25660,6 +25660,9 @@ async function run() {
   core.setOutput("next-snapshot", next.version());
 }
 
+if (require.main === require.cache[eval('__filename')]) {
+  run();
+}
 module.exports = {
   run,
 };

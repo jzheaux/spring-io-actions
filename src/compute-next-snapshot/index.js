@@ -12,6 +12,9 @@ async function run() {
   core.setOutput("next-snapshot", next.version());
 }
 
+if (require.main === module) {
+  run();
+}
 module.exports = {
   run,
 };
