@@ -19,9 +19,5 @@ runs:
         git config user.name 'github-actions[bot]'
         git config user.email 'github-actions[bot]@users.noreply.github.com'
         set +e
-        git tag -d ${{ inputs.tag }}
-        git push --delete origin ${{ inputs.tag }}
-        gh release delete ${{ inputs.tag }} -y
-        git tag ${{ inputs.tag }}
-        git push --tags origin
+        gh release delete ${{ inputs.tag }} -y --cleanup-tag
         gh release create ${{ inputs.tag }} -F ${{ inputs.release-notes-location }} ${{ (contains(inputs.tag, '-M') || contains(inputs.tag, '-RC')) && '--prerelease' || '' }}
