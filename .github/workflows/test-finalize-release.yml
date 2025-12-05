@@ -35,10 +35,10 @@ jobs:
     steps:
       - uses: jzheaux/spring-io-actions/update-learn-page@main
         with:
-          website-token: ${{ secrets.WEBSITE_TOKEN }}
-          website-repository: ${{ env.WEBSITE_REPOSITORY }}
-          version: ${{ needs.planner.outputs.version }}
+          milestone-title: ${{ needs.planner.outputs.version }}
           project-name: 'spring-widgets'
+          website-repository: ${{ env.WEBSITE_REPOSITORY }}
+          website-token: ${{ secrets.WEBSITE_TOKEN }}
       - uses: actions/checkout@v4
         with:
           repository: ${{ env.WIDGETS_REPOSITORY }}
@@ -57,50 +57,50 @@ jobs:
       - name: Announce Release on GChat
         uses: jzheaux/spring-io-actions/announce-on-gchat@main
         with:
+          gchat-webhook-url: ${{ secrets.GCHAT_WEBHOOK_URL }}
           milestone-title: ${{ needs.planner.outputs.version }}
           project-name: 'spring-widgets'
-          gchat-webhook-url: ${{ secrets.GCHAT_WEBHOOK_URL }}
       - name: Close Release Milestone
         uses: jzheaux/spring-io-actions/close-milestone@main
         with:
+          milestone-repository: ${{ env.WIDGETS_REPOSITORY }}
           milestone-title: ${{ needs.planner.outputs.version }}
-          repository-name: ${{ env.WIDGETS_REPOSITORY }}
-          repository-token: ${{ secrets.WIDGETS_TOKEN }}
+          milestone-token: ${{ secrets.WIDGETS_TOKEN }}
       - id: next-release-milestone
         uses: jzheaux/spring-io-actions/compute-next-version@main
         with:
-          current-version: ${{ needs.planner.outputs.version }}
-          milestone-token: ${{ secrets.WIDGETS_TOKEN }}
           milestone-repository: ${{ env.WIDGETS_REPOSITORY }}
+          milestone-title: ${{ needs.planner.outputs.version }}
+          milestone-token: ${{ secrets.WIDGETS_TOKEN }}
+          project-slug: 'spring-widgets'
           website-repository: ${{ env.WEBSITE_REPOSITORY }}
           website-token: ${{ secrets.WEBSITE_TOKEN }}
-          project-slug: 'spring-widgets'
       - name: Ensure Next Release Scheduled
         uses: jzheaux/spring-io-actions/schedule-milestone@main
         if: ${{ steps.next-release-milestone.outputs.next-version-type  == 'oss' }}
         with:
-          milestone-title: ${{ steps.next-release-milestone.outputs.next-version }}
           milestone-date: ${{ steps.next-release-milestone.outputs.next-version-date }}
-          repository-name: ${{ env.WIDGETS_REPOSITORY }}
-          repository-token: ${{ secrets.WIDGETS_TOKEN }}
+          milestone-repository: ${{ env.WIDGETS_REPOSITORY }}
+          milestone-title: ${{ steps.next-release-milestone.outputs.next-version }}
+          milestone-token: ${{ secrets.WIDGETS_TOKEN }}
       - id: next-next-release-milestone
         uses: jzheaux/spring-io-actions/compute-next-version@main
         if: ${{ steps.next-release-milestone.outputs.next-version-type  == 'oss' }}
         with:
-          current-version: ${{ steps.next-release-milestone.outputs.next-version }}
-          milestone-token: ${{ secrets.WIDGETS_TOKEN }}
           milestone-repository: ${{ env.WIDGETS_REPOSITORY }}
-          website-repository: ${{ env.WEBSITE_REPOSITORY }}
-          website-token: ${{ secrets.WEBSITE_TOKEN }}
+          milestone-title: ${{ steps.next-release-milestone.outputs.next-version }}
+          milestone-token: ${{ secrets.WIDGETS_TOKEN }}
           project-slug: 'spring-widgets'
+          website-token: ${{ secrets.WEBSITE_TOKEN }}
+          website-repository: ${{ env.WEBSITE_REPOSITORY }}
       - name: Ensure Next Next Release Scheduled
         uses: jzheaux/spring-io-actions/schedule-milestone@main
         if: ${{ steps.next-next-release-milestone.outputs.next-version-type  == 'oss' }}
         with:
-          milestone-title: ${{ steps.next-next-release-milestone.outputs.next-version }}
           milestone-date: ${{ steps.next-next-release-milestone.outputs.next-version-date }}
-          repository-name: ${{ env.WIDGETS_REPOSITORY }}
-          repository-token: ${{ secrets.WIDGETS_TOKEN }}
+          milestone-repository: ${{ env.WIDGETS_REPOSITORY }}
+          milestone-title: ${{ steps.next-next-release-milestone.outputs.next-version }}
+          milestone-token: ${{ secrets.WIDGETS_TOKEN }}
       - name: Update Version
         uses: jzheaux/spring-io-actions/push-next-development-version@main
         with:
