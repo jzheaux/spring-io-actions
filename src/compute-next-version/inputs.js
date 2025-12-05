@@ -4,49 +4,49 @@ class Inputs {
   constructor() {
     const repository = process.env.GITHUB_REPOSITORY.split("/")[1];
     const commercial = repository.endsWith("-commercial");
+    this._milestoneTitle = core.getInput("milestone-title", { required: true });
+    this._milestoneToken = core.getInput("milestone-token", {
+      required: true,
+    });
+    this._websiteToken = core.getInput("website-token", { required: true });
+    this._milestoneRepository =
+      core.getInput("milestone-repository") || process.env.GITHUB_REPOSITORY;
     let websiteRepository = core.getInput("website-repository");
     if (!websiteRepository) {
       websiteRepository = commercial
         ? "spring-io/spring-website-commercial-content"
         : "spring-io/spring-website-content";
     }
-    this._websiteRepository = websiteRepository;
     let projectSlug = core.getInput("project-slug");
     if (!projectSlug) {
       projectSlug = repository.replace("-commercial", "");
     }
     this._projectSlug = projectSlug;
-    this._milestonesToken = core.getInput("milestone-token", {
-      required: true,
-    });
-    this._milestoneRepository =
-      core.getInput("milestone-repository") || process.env.GITHUB_REPOSITORY;
-    this._websiteToken = core.getInput("website-token", { required: true });
-    this._currentVersion = core.getInput("current-version", { required: true });
+    this._websiteRepository = websiteRepository;
   }
 
-  get websiteRepository() {
-    return this._websiteRepository;
+  get milestoneTitle() {
+    return this._milestoneTitle;
   }
 
-  get projectSlug() {
-    return this._projectSlug;
-  }
-
-  get milestonesToken() {
-    return this._milestonesToken;
-  }
-
-  get milestoneRepository() {
-    return this._milestoneRepository;
+  get milestoneToken() {
+    return this._milestoneToken;
   }
 
   get websiteToken() {
     return this._websiteToken;
   }
 
-  get currentVersion() {
-    return this._currentVersion;
+  get milestoneRepository() {
+    return this._milestoneRepository;
+  }
+
+  get projectSlug() {
+    return this._projectSlug;
+  }
+
+  get websiteRepository() {
+    return this._websiteRepository;
   }
 }
 

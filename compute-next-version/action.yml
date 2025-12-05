@@ -1,32 +1,36 @@
 name: "compute-next-version"
 description: "An action that computes the next milestone release name and date"
 author: "jzheaux"
+
 inputs:
-  current-version:
+  milestone-title:
     description: "The current project version"
     required: true
-  website-token:
-    description: "The GitHub token needed to query spring-website-content for generation information"
+  milestone-token:
+    description: "The token needed to query project milestone information"
     required: true
-  website-repository:
-    description: "The GitHub repository for website content"
+  website-token:
+    description: "The token needed to query spring-website-content for generation information"
+    required: true
+
+  milestone-repository:
+    description: "The repository to query project milestone information"
     required: false
   project-slug:
     description: "The website content slug"
     required: false
-  milestone-repository:
-    description: "The GitHub repository to query project milestone information"
+  website-repository:
+    description: "The repository for website content"
     required: false
-  milestone-token:
-    description: "The GitHub token needed to query project milestone information"
-    required: true
+
 outputs:
   next-version:
     description: "The next project version"
-  next-version-type:
-    description: "The type of the next project version (e.g., 'oss', 'enterprise')"
   next-version-date:
     description: "The scheduled date for the next project version"
+  next-version-type:
+    description: "The type of the next project version (for example, 'oss', 'enterprise')"
+
 runs:
   using: "node20"
   main: '../dist/compute-next-version/main/index.js'
