@@ -25654,9 +25654,8 @@ const { Version } = __nccwpck_require__(6100);
 const inputs = new Inputs();
 
 async function run() {
-  const version = new Version(inputs.currentVersion);
+  const version = new Version(inputs.milestoneTitle);
   const next = version.nextSnapshot();
-
   core.setOutput("snapshot-version", next.version);
 }
 
@@ -25678,11 +25677,11 @@ const core = __nccwpck_require__(7484);
 
 class Inputs {
   constructor() {
-    this._currentVersion = core.getInput("version", { required: true });
+    this._milestoneTitle = core.getInput("milestone-title", { required: true });
   }
 
-  get currentVersion() {
-    return this._currentVersion;
+  get milestoneTitle() {
+    return this._milestoneTitle;
   }
 }
 
@@ -25739,7 +25738,7 @@ module.exports = {
 
 const { getReleaseDate, mod } = __nccwpck_require__(1482);
 
-const t = {
+const releaseTrainMonths = {
   M1: [0, 6],
   M2: [1, 7],
   M3: [2, 8],
@@ -25747,6 +25746,11 @@ const t = {
   "": [4, 10],
 };
 
+/**
+ * A class representing a version of the project.
+ *
+ * @author Josh Cummings
+ */
 class Version {
   constructor(version, dueDate = new Date(), type = "oss") {
     this._version = version;
@@ -25759,6 +25763,13 @@ class Version {
     this._classifier = parts.length === 3 ? "" : parts[3];
   }
 
+  /**
+   * Construct a {@linkcode Version} instance based on a {@linkcode Milestones}
+   * value.
+   *
+   * @param milestone a milestone acquired from {@linkcode Milestones}
+   * @returns {Version}
+   */
   static fromMilestone(milestone) {
     return new Version(milestone.name, milestone.dueDate, milestone.type);
   }
@@ -25791,19 +25802,38 @@ class Version {
     return this._type;
   }
 
+  /**
+   * Whether this version is a snapshot version
+   * @returns {boolean}
+   */
   get snapshot() {
     return this._classifier === "SNAPSHOT";
   }
 
+  /**
+   * Whether this version is a pre-release version, like RC1 or M2
+   * @returns {boolean}
+   */
   get prerelease() {
     return !!(this._classifier && this._classifier !== "SNAPSHOT");
   }
 
+  /**
+   * Whether this version is a GA version
+   * @returns {boolean}
+   */
   get ga() {
     return !this._classifier;
   }
 
-  nextRelease(generation) {
+  /**
+   * Get the next milestone that follows after this version;
+   * returns {@code null} if given a snapshot version
+   *
+   * @param generation generation detail from {@linkcode Website}
+   * @returns {Version|null}
+   */
+  nextMilestone(generation) {
     if (this.snapshot) {
       return null;
     }
@@ -25813,16 +25843,21 @@ class Version {
     return _nextMilestone(this, generation);
   }
 
+  /**
+   * Get the next snapshot that follows after this version.
+   *
+   * @returns {Version}
+   */
   nextSnapshot() {
     return _nextSnapshot(this);
   }
 
-  toString() {
-    return this._classifier
-      ? `${this._major}.${this._minor}.${this._patch}-${this._classifier}`
-      : `${this._major}.${this._minor}.${this._patch}`;
-  }
-
+  /**
+   * Check if this version is the same major/minor generation as
+   * {@code other}
+   * @param other the version to compare to
+   * @returns {boolean}
+   */
   isSameMajorMinor(other) {
     return this.major === other.major && this.minor === other.minor;
   }
@@ -25889,7 +25924,7 @@ function _nextGaDate(version, generation) {
 function _nextMilestone(v, generation) {
   const nextVersion = new Version(_nextMilestoneVersion(v), v.dueDate, v.type);
   const nextDate = _nextMilestoneDate(nextVersion, generation);
-  return new Version(nextVersion.toString(), nextDate, v.type);
+  return new Version(nextVersion.version, nextDate, v.type);
 }
 
 function _nextMilestoneVersion(version) {
@@ -25907,7 +25942,7 @@ function _nextMilestoneVersion(version) {
 
 function _nextMilestoneDate(version, generation) {
   const currentMonth = version.dueDate.getMonth();
-  const candidateMonths = t[version._classifier];
+  const candidateMonths = releaseTrainMonths[version._classifier];
   const index =
     mod(candidateMonths[0] - currentMonth, 12) <
     mod(candidateMonths[1] - currentMonth, 12)

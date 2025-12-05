@@ -32403,16 +32403,17 @@ function wrappy (fn, cb) {
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const core = __nccwpck_require__(7484);
+const { Inputs } = __nccwpck_require__(7660);
 const { Milestones } = __nccwpck_require__(7454);
 
 async function run() {
+  const inputs = new Inputs();
+  const milestones = new Milestones(
+    inputs.milestoneToken,
+    inputs.milestoneRepository,
+  );
   try {
-    const milestoneTitle = core.getInput("milestone-title");
-    const token = core.getInput("repository-token");
-    const repository =
-      core.getInput("repository-name") || process.env.GITHUB_REPOSITORY;
-    const milestones = new Milestones(token, repository);
-    await milestones.closeMilestone(milestoneTitle);
+    await milestones.closeMilestone(inputs.milestoneTitle);
   } catch (error) {
     core.setFailed(error.message);
   }
@@ -32427,40 +32428,77 @@ module.exports = run;
 
 /***/ }),
 
+/***/ 7660:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const core = __nccwpck_require__(7484);
+
+class Inputs {
+  constructor() {
+    this._milestoneTitle = core.getInput("milestone-title", { required: true });
+    this._milestoneToken =
+      core.getInput("milestone-token") || process.env.GITHUB_TOKEN;
+    this._milestoneRepository =
+      core.getInput("milestone-repository") || process.env.GITHUB_REPOSITORY;
+  }
+
+  get milestoneTitle() {
+    return this._milestoneTitle;
+  }
+
+  get milestoneToken() {
+    return this._milestoneToken;
+  }
+
+  get milestoneRepository() {
+    return this._milestoneRepository;
+  }
+}
+
+module.exports = {
+  Inputs,
+};
+
+
+/***/ }),
+
 /***/ 7454:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const { Octokit } = __nccwpck_require__(5772);
+
 /**
- * Helper for working with GitHub milestones via Octokit.
+ * A class for interacting with GitHub milestones.
+ * Specifically, the class checks for a milestone's existence
+ * before attempting operations in order to preempt errors
+ * from GitHub
  *
- * Usage:
- *   const milestones = new Milestones(process.env.GITHUB_TOKEN);
+ * @author Josh Cummings
  */
 class Milestones {
   /**
    * @param token the GH token needed to query milestones
-   * @param repo the GH repository to operate on
+   * @param repo the GH repository, like {@code spring-projects/spring-security} to operate on
    */
   constructor(token, repo) {
-    this.octokit = new Octokit({ auth: token });
-    this.repo = repo;
+    this.gh = new Octokit({ auth: token });
+    this.owner = repo.split("/")[0];
+    this.repo = repo.split("/")[1];
     this.milestoneType = this.repo.endsWith("-commercial")
       ? "enterprise"
       : "oss";
   }
 
   /**
-   * Internal helper to find a milestone by title (name).
-   * Searches across all states (open + closed).
+   * Find milestone by {@code title} regardless of state
    *
    * @param {string} title
    * @returns {Promise<null | { number: number, name: string, dueDate: Date | null }>}
    */
-  async findMilestoneByName(title) {
-    const { data: milestones } = await this.octokit.rest.issues.listMilestones({
-      owner: this.repo.split("/")[0],
-      repo: this.repo.split("/")[1],
+  async findMilestoneByTitle(title) {
+    const { data: milestones } = await this.gh.rest.issues.listMilestones({
+      owner: this.owner,
+      repo: this.repo,
       state: "all",
       per_page: 100,
     });
@@ -32478,33 +32516,45 @@ class Milestones {
     };
   }
 
+  /**
+   * Close a milestone, if it exists
+   * @param title the milestone title
+   * @returns {Promise<void>}
+   */
   async closeMilestone(title) {
-    const milestone = await this.findMilestoneByName(title);
+    const milestone = await this.findMilestoneByTitle(title);
     if (milestone) {
-      await this.octokit.rest.issues.updateMilestone({
-        owner: this.repo.split("/")[0],
-        repo: this.repo.split("/")[1],
+      await this.gh.rest.issues.updateMilestone({
+        owner: this.owner,
+        repo: this.repo,
         milestone_number: milestone.number,
         state: "closed",
       });
     }
   }
 
+  /**
+   * Schedule a milestone or update the existing one
+   * @param title the milestone title
+   * @param date the milestone due date
+   * @param description the milestone description
+   * @returns {Promise<void>}
+   */
   async scheduleMilestone(title, date, description) {
-    const milestone = await this.findMilestoneByName(title);
+    const milestone = await this.findMilestoneByTitle(title);
     const dueDate = new Date(date).toISOString();
     if (milestone) {
-      await this.octokit.rest.issues.updateMilestone({
-        owner: this.repo.split("/")[0],
-        repo: this.repo.split("/")[1],
+      await this.gh.rest.issues.updateMilestone({
+        owner: this.owner,
+        repo: this.repo,
         milestone_number: milestone.number,
         due_on: dueDate,
         description: description,
       });
     } else {
-      await this.octokit.rest.issues.createMilestone({
-        owner: this.repo.split("/")[0],
-        repo: this.repo.split("/")[1],
+      await this.gh.rest.issues.createMilestone({
+        owner: this.owner,
+        repo: this.repo,
         title: title,
         due_on: dueDate,
         description: description,

@@ -32724,7 +32724,7 @@ const { Version } = __nccwpck_require__(6100);
 
 const inputs = new Inputs();
 const milestones = new Milestones(
-  inputs.milestonesToken,
+  inputs.milestoneToken,
   inputs.milestoneRepository,
 );
 const projects = new Website(inputs);
@@ -32733,37 +32733,37 @@ async function run() {
   const version = await _getVersion();
   if (!version) {
     core.setFailed(
-      `Could not find milestone ${inputs.currentVersion} or it has no due date.`,
+      `Could not find milestone ${inputs.milestoneTitle} or it has no due date.`,
     );
     return;
   }
   const generation = await _getGeneration(version);
   if (!generation) {
     core.setFailed(
-      `Could not find generation for version ${inputs.currentVersion}.`,
+      `Could not find generation for version ${inputs.milestoneTitle}.`,
     );
     return;
   }
-  const release = generation.nextRelease(version);
+  const release = version.nextMilestone(generation);
   if (!release) {
     core.setFailed(
-      `Could not calculate next release for version ${inputs.currentVersion}.`,
+      `Could not calculate next release for version ${inputs.milestoneTitle}.`,
     );
     return;
   }
-  const nextVersion = release.toString();
+  const nextVersion = release.version;
   const nextVersionType = release.type;
   const nextVersionDate = release.dueDate.toISOString().substring(0, 10);
   console.log(
     `Next version is ${nextVersion} (${nextVersionType}) on ${nextVersionDate}`,
   );
   core.setOutput("next-version", nextVersion);
-  core.setOutput("next-version-type", nextVersionType);
   core.setOutput("next-version-date", nextVersionDate);
+  core.setOutput("next-version-type", nextVersionType);
 }
 
 async function _getVersion() {
-  const milestone = await milestones.findMilestoneByName(inputs.currentVersion);
+  const milestone = await milestones.findMilestoneByName(inputs.milestoneTitle);
   if (!milestone || !milestone.dueDate) {
     return null;
   }
@@ -32798,49 +32798,49 @@ class Inputs {
   constructor() {
     const repository = process.env.GITHUB_REPOSITORY.split("/")[1];
     const commercial = repository.endsWith("-commercial");
+    this._milestoneTitle = core.getInput("milestone-title", { required: true });
+    this._milestoneToken = core.getInput("milestone-token", {
+      required: true,
+    });
+    this._websiteToken = core.getInput("website-token", { required: true });
+    this._milestoneRepository =
+      core.getInput("milestone-repository") || process.env.GITHUB_REPOSITORY;
     let websiteRepository = core.getInput("website-repository");
     if (!websiteRepository) {
       websiteRepository = commercial
         ? "spring-io/spring-website-commercial-content"
         : "spring-io/spring-website-content";
     }
-    this._websiteRepository = websiteRepository;
     let projectSlug = core.getInput("project-slug");
     if (!projectSlug) {
       projectSlug = repository.replace("-commercial", "");
     }
     this._projectSlug = projectSlug;
-    this._milestonesToken = core.getInput("milestone-token", {
-      required: true,
-    });
-    this._milestoneRepository =
-      core.getInput("milestone-repository") || process.env.GITHUB_REPOSITORY;
-    this._websiteToken = core.getInput("website-token", { required: true });
-    this._currentVersion = core.getInput("current-version", { required: true });
+    this._websiteRepository = websiteRepository;
   }
 
-  get websiteRepository() {
-    return this._websiteRepository;
+  get milestoneTitle() {
+    return this._milestoneTitle;
   }
 
-  get projectSlug() {
-    return this._projectSlug;
-  }
-
-  get milestonesToken() {
-    return this._milestonesToken;
-  }
-
-  get milestoneRepository() {
-    return this._milestoneRepository;
+  get milestoneToken() {
+    return this._milestoneToken;
   }
 
   get websiteToken() {
     return this._websiteToken;
   }
 
-  get currentVersion() {
-    return this._currentVersion;
+  get milestoneRepository() {
+    return this._milestoneRepository;
+  }
+
+  get projectSlug() {
+    return this._projectSlug;
+  }
+
+  get websiteRepository() {
+    return this._websiteRepository;
   }
 }
 
@@ -32896,36 +32896,39 @@ module.exports = {
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const { Octokit } = __nccwpck_require__(5772);
+
 /**
- * Helper for working with GitHub milestones via Octokit.
+ * A class for interacting with GitHub milestones.
+ * Specifically, the class checks for a milestone's existence
+ * before attempting operations in order to preempt errors
+ * from GitHub
  *
- * Usage:
- *   const milestones = new Milestones(process.env.GITHUB_TOKEN);
+ * @author Josh Cummings
  */
 class Milestones {
   /**
    * @param token the GH token needed to query milestones
-   * @param repo the GH repository to operate on
+   * @param repo the GH repository, like {@code spring-projects/spring-security} to operate on
    */
   constructor(token, repo) {
-    this.octokit = new Octokit({ auth: token });
-    this.repo = repo;
+    this.gh = new Octokit({ auth: token });
+    this.owner = repo.split("/")[0];
+    this.repo = repo.split("/")[1];
     this.milestoneType = this.repo.endsWith("-commercial")
       ? "enterprise"
       : "oss";
   }
 
   /**
-   * Internal helper to find a milestone by title (name).
-   * Searches across all states (open + closed).
+   * Find milestone by {@code title} regardless of state
    *
    * @param {string} title
    * @returns {Promise<null | { number: number, name: string, dueDate: Date | null }>}
    */
-  async findMilestoneByName(title) {
-    const { data: milestones } = await this.octokit.rest.issues.listMilestones({
-      owner: this.repo.split("/")[0],
-      repo: this.repo.split("/")[1],
+  async findMilestoneByTitle(title) {
+    const { data: milestones } = await this.gh.rest.issues.listMilestones({
+      owner: this.owner,
+      repo: this.repo,
       state: "all",
       per_page: 100,
     });
@@ -32943,33 +32946,45 @@ class Milestones {
     };
   }
 
+  /**
+   * Close a milestone, if it exists
+   * @param title the milestone title
+   * @returns {Promise<void>}
+   */
   async closeMilestone(title) {
-    const milestone = await this.findMilestoneByName(title);
+    const milestone = await this.findMilestoneByTitle(title);
     if (milestone) {
-      await this.octokit.rest.issues.updateMilestone({
-        owner: this.repo.split("/")[0],
-        repo: this.repo.split("/")[1],
+      await this.gh.rest.issues.updateMilestone({
+        owner: this.owner,
+        repo: this.repo,
         milestone_number: milestone.number,
         state: "closed",
       });
     }
   }
 
+  /**
+   * Schedule a milestone or update the existing one
+   * @param title the milestone title
+   * @param date the milestone due date
+   * @param description the milestone description
+   * @returns {Promise<void>}
+   */
   async scheduleMilestone(title, date, description) {
-    const milestone = await this.findMilestoneByName(title);
+    const milestone = await this.findMilestoneByTitle(title);
     const dueDate = new Date(date).toISOString();
     if (milestone) {
-      await this.octokit.rest.issues.updateMilestone({
-        owner: this.repo.split("/")[0],
-        repo: this.repo.split("/")[1],
+      await this.gh.rest.issues.updateMilestone({
+        owner: this.owner,
+        repo: this.repo,
         milestone_number: milestone.number,
         due_on: dueDate,
         description: description,
       });
     } else {
-      await this.octokit.rest.issues.createMilestone({
-        owner: this.repo.split("/")[0],
-        repo: this.repo.split("/")[1],
+      await this.gh.rest.issues.createMilestone({
+        owner: this.owner,
+        repo: this.repo,
         title: title,
         due_on: dueDate,
         description: description,
@@ -32990,7 +33005,7 @@ module.exports = {
 
 const { getReleaseDate, mod } = __nccwpck_require__(1482);
 
-const t = {
+const releaseTrainMonths = {
   M1: [0, 6],
   M2: [1, 7],
   M3: [2, 8],
@@ -32998,6 +33013,11 @@ const t = {
   "": [4, 10],
 };
 
+/**
+ * A class representing a version of the project.
+ *
+ * @author Josh Cummings
+ */
 class Version {
   constructor(version, dueDate = new Date(), type = "oss") {
     this._version = version;
@@ -33010,6 +33030,13 @@ class Version {
     this._classifier = parts.length === 3 ? "" : parts[3];
   }
 
+  /**
+   * Construct a {@linkcode Version} instance based on a {@linkcode Milestones}
+   * value.
+   *
+   * @param milestone a milestone acquired from {@linkcode Milestones}
+   * @returns {Version}
+   */
   static fromMilestone(milestone) {
     return new Version(milestone.name, milestone.dueDate, milestone.type);
   }
@@ -33042,19 +33069,38 @@ class Version {
     return this._type;
   }
 
+  /**
+   * Whether this version is a snapshot version
+   * @returns {boolean}
+   */
   get snapshot() {
     return this._classifier === "SNAPSHOT";
   }
 
+  /**
+   * Whether this version is a pre-release version, like RC1 or M2
+   * @returns {boolean}
+   */
   get prerelease() {
     return !!(this._classifier && this._classifier !== "SNAPSHOT");
   }
 
+  /**
+   * Whether this version is a GA version
+   * @returns {boolean}
+   */
   get ga() {
     return !this._classifier;
   }
 
-  nextRelease(generation) {
+  /**
+   * Get the next milestone that follows after this version;
+   * returns {@code null} if given a snapshot version
+   *
+   * @param generation generation detail from {@linkcode Website}
+   * @returns {Version|null}
+   */
+  nextMilestone(generation) {
     if (this.snapshot) {
       return null;
     }
@@ -33064,16 +33110,21 @@ class Version {
     return _nextMilestone(this, generation);
   }
 
+  /**
+   * Get the next snapshot that follows after this version.
+   *
+   * @returns {Version}
+   */
   nextSnapshot() {
     return _nextSnapshot(this);
   }
 
-  toString() {
-    return this._classifier
-      ? `${this._major}.${this._minor}.${this._patch}-${this._classifier}`
-      : `${this._major}.${this._minor}.${this._patch}`;
-  }
-
+  /**
+   * Check if this version is the same major/minor generation as
+   * {@code other}
+   * @param other the version to compare to
+   * @returns {boolean}
+   */
   isSameMajorMinor(other) {
     return this.major === other.major && this.minor === other.minor;
   }
@@ -33140,7 +33191,7 @@ function _nextGaDate(version, generation) {
 function _nextMilestone(v, generation) {
   const nextVersion = new Version(_nextMilestoneVersion(v), v.dueDate, v.type);
   const nextDate = _nextMilestoneDate(nextVersion, generation);
-  return new Version(nextVersion.toString(), nextDate, v.type);
+  return new Version(nextVersion.version, nextDate, v.type);
 }
 
 function _nextMilestoneVersion(version) {
@@ -33158,7 +33209,7 @@ function _nextMilestoneVersion(version) {
 
 function _nextMilestoneDate(version, generation) {
   const currentMonth = version.dueDate.getMonth();
-  const candidateMonths = t[version._classifier];
+  const candidateMonths = releaseTrainMonths[version._classifier];
   const index =
     mod(candidateMonths[0] - currentMonth, 12) <
     mod(candidateMonths[1] - currentMonth, 12)
@@ -33199,19 +33250,31 @@ const { Octokit } = __nccwpck_require__(5772);
 const { Base64 } = __nccwpck_require__(5810);
 const { getWeekOfMonthAndDayOfWeek } = __nccwpck_require__(1482);
 
+/**
+ * Class for interacting with material in {@code spring-website-content}
+ *
+ * @author Josh Cummings
+ */
 class Website {
   constructor(inputs) {
     this.gh = new Octokit({ auth: inputs.websiteToken });
-    this.repo = inputs.websiteRepository;
-    this.slug = inputs.projectSlug;
+    this.owner = inputs.websiteRepository.split("/")[0];
+    this.repo = inputs.websiteRepository.split("/")[1];
+    this.projectSlug = inputs.projectSlug;
   }
 
+  /**
+   * Look up generate data using the major and minor version numbers in
+   * the supplied {@linkcode Version}.
+   * @param version
+   * @returns {Promise<{generation: {major: number, minor: number}, dayOfWeek: *, weekOfMonth: number, oss: {frequency: number, offset: number, end: {year: number, month: number}}, enterprise: {frequency: number, offset: number, end: {year: number, month: number}}}|null>}
+   */
   async getGenerationByVersion(version) {
     const file = await _load(
       this.gh,
-      this.repo.split("/")[0],
-      this.repo.split("/")[1],
-      `/project/${this.slug}/generations.json`,
+      this.owner,
+      this.repo,
+      `/project/${this.projectSlug}/generations.json`,
     );
     const asStrings = JSON.parse(file);
     const { dayOfWeek, weekOfMonth } = getWeekOfMonthAndDayOfWeek(
@@ -33222,11 +33285,8 @@ class Website {
         `Checking generation ${generation.generation} against ${version.major}.${version.minor}`,
       );
       const majorMinor = _generation(generation.generation);
-      if (
-        majorMinor.major === version.major &&
-        majorMinor.minor === version.minor
-      ) {
-        const result = {
+      if (version.isSameMajorMinor(majorMinor)) {
+        return {
           generation: majorMinor,
           dayOfWeek,
           weekOfMonth,
@@ -33240,9 +33300,7 @@ class Website {
             offset: 1,
             end: _date(generation.enterpriseSupportEnd),
           },
-          nextRelease: (version) => version.nextRelease(result),
         };
-        return result;
       }
     }
     return null;
