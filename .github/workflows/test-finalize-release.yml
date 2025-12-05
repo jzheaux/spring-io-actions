@@ -57,7 +57,7 @@ jobs:
       - name: Announce Release on GChat
         uses: jzheaux/spring-io-actions/announce-on-gchat@main
         with:
-          project-version: ${{ needs.planner.outputs.version }}
+          milestone-title: ${{ needs.planner.outputs.version }}
           project-name: 'spring-widgets'
           gchat-webhook-url: ${{ secrets.GCHAT_WEBHOOK_URL }}
       - name: Close Release Milestone

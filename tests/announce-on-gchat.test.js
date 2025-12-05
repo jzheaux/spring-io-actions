@@ -14,8 +14,8 @@ describe('announce-on-gchat', () => {
 
 	it('announces a release', async () => {
 		Inputs.mockImplementation(() => ({
-			webhookUrl: 'https://example.com',
-			projectVersion: '1.2.3',
+			gchatWebhookUrl: 'https://example.com',
+            milestoneTitle: '1.2.3',
 			get projectName() {
 				return process.env.GITHUB_REPOSITORY.split('/')[1];
 			}
@@ -27,8 +27,8 @@ describe('announce-on-gchat', () => {
 
 	it('uses project-name', async () => {
 		inputs = {
-			webhookUrl: 'https://example.com',
-			projectVersion: '1.2.3',
+            gchatWebhookUrl: 'https://example.com',
+			milestoneTitle: '1.2.3',
 			projectName: 'project'
         };
         Inputs.mockImplementation(() => inputs);

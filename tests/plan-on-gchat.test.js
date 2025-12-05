@@ -28,7 +28,7 @@ describe('plan-on-gchat', () => {
 
 	it('uses project-name', async () => {
 		inputs = {
-			webhookUrl: 'https://example.com',
+            webhookUrl: 'https://example.com',
 			milestoneTitle: 'title',
 			milestoneDate: '2025-12-25',
 			projectName: 'project'
