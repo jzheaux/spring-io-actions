@@ -2,11 +2,11 @@ const core = require("@actions/core");
 
 class Inputs {
   constructor() {
-    this._currentVersion = core.getInput("version", { required: true });
+    this._milestoneTitle = core.getInput("milestone-title", { required: true });
   }
 
-  get currentVersion() {
-    return this._currentVersion;
+  get milestoneTitle() {
+    return this._milestoneTitle;
   }
 }
 

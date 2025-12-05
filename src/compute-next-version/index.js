@@ -27,14 +27,14 @@ async function run() {
     );
     return;
   }
-  const release = generation.nextRelease(version);
+  const release = generation.nextMilestone(version);
   if (!release) {
     core.setFailed(
       `Could not calculate next release for version ${inputs.currentVersion}.`,
     );
     return;
   }
-  const nextVersion = release.toString();
+  const nextVersion = release.version;
   const nextVersionType = release.type;
   const nextVersionDate = release.dueDate.toISOString().substring(0, 10);
   console.log(

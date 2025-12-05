@@ -1,13 +1,15 @@
-name: "compute-version"
-description: "An action that determines the project version"
+name: "compute-next-snapshot"
+description: "An action that determines the next snapshot version for the project"
 author: "jzheaux"
+
 inputs:
-  version:
-    description: "The current project version"
+  milestone-title:
+    description: "The title of the current milestone"
     required: true
+
 outputs:
   snapshot-version:
-    description: "The next snaphot version of the project"
+    description: "The next snapshot version for the project"
     value: ${{ steps.compute-version.outputs.version }}
 
 runs:

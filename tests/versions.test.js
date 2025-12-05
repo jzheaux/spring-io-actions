@@ -57,8 +57,8 @@ describe('version', () => {
 
     it('should calculate the next GA release', () => {
         const v = new Version('1.2.3', new Date(2025, 10, 24));
-        const next = v.nextRelease(generation);
-        expect(next.toString()).toBe('1.2.4');
+        const next = v.nextMilestone(generation);
+        expect(next.version).toBe('1.2.4');
         expect(next.type).toBe('oss');
         expect(next.dueDate.getFullYear()).toBe(2025);
         expect(next.dueDate.getMonth()).toBe(11);
@@ -71,8 +71,8 @@ describe('version', () => {
             weekOfMonth: 3
         };
         const v = new Version('1.2.3-M1', new Date(2025, 10, 24));
-        const next = v.nextRelease(generation);
-        expect(next.toString()).toBe('1.2.3-M2');
+        const next = v.nextMilestone(generation);
+        expect(next.version).toBe('1.2.3-M2');
         expect(next.type).toBe('oss');
         expect(next.dueDate.getFullYear()).toBe(2026)
         expect(next.dueDate.getMonth()).toBe(1) // M2 releases in February and August
@@ -81,8 +81,8 @@ describe('version', () => {
 
     it('should calculate the next GA commercial release', () => {
         const v = new Version('1.2.3', new Date(2026, 11, 28));
-        const next = v.nextRelease(generation);
-        expect(next.toString()).toBe('1.2.4');
+        const next = v.nextMilestone(generation);
+        expect(next.version).toBe('1.2.4');
         expect(next.type).toBe('enterprise');
         expect(next.dueDate.getFullYear()).toBe(2027);
         expect(next.dueDate.getMonth()).toBe(1); // commercial releases are Feb, May, Aug, Nov
@@ -92,12 +92,12 @@ describe('version', () => {
     it('should calculate the next snapshot for a GA release', () => {
         const v = new Version('1.2.3');
         const next = v.nextSnapshot();
-        expect(next.toString()).toBe('1.2.4-SNAPSHOT');
+        expect(next.version).toBe('1.2.4-SNAPSHOT');
     });
 
     it('should calculate the next snapshot for a pre-release', () => {
         const v = new Version('1.2.3-M1');
         const next = v.nextSnapshot();
-        expect(next.toString()).toBe('1.2.3-SNAPSHOT');
+        expect(next.version).toBe('1.2.3-SNAPSHOT');
     });
 });

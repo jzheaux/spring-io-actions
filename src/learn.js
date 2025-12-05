@@ -22,7 +22,7 @@ class Entry {
 
   toJSON() {
     return {
-      version: this.version.toString(),
+      version: this.version.version,
       isAntora: this.isAntora,
       referenceDocUrl: this.referenceDocUrl,
       apiDocUrl: this.apiDocUrl,
@@ -57,7 +57,7 @@ class LearnPage {
 
   _sortAndMarkCurrent() {
     this._entries.sort((a, b) =>
-      compareVersions(b.version.toString(), a.version.toString()),
+      compareVersions(b.version.version, a.version.version),
     );
     let foundCurrent = false;
     for (const entry of this._entries) {

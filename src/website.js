@@ -43,7 +43,7 @@ class Website {
             offset: 1,
             end: _date(generation.enterpriseSupportEnd),
           },
-          nextRelease: (version) => version.nextRelease(result),
+          nextRelease: (version) => version.nextMilestone(result),
         };
         return result;
       }
