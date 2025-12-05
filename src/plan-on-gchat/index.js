@@ -4,13 +4,9 @@ const { Announce } = require("../announce");
 
 async function run() {
   const inputs = new Inputs();
-  const webhookUrl = inputs.webhookUrl;
-  const milestoneTitle = inputs.milestoneTitle;
-  const milestoneDate = inputs.milestoneDate;
-  const projectName = inputs.projectName;
-  const announce = new Announce(webhookUrl, projectName);
+  const announce = new Announce(inputs.gchatWebhookUrl, inputs.projectName);
   try {
-    await announce.planRelease(milestoneTitle, milestoneDate);
+    await announce.planRelease(inputs.milestoneTitle, inputs.milestoneDate);
   } catch (error) {
     core.setFailed(error.message);
   }

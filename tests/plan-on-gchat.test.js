@@ -14,7 +14,7 @@ describe('plan-on-gchat', () => {
 
 	it('plans a release', async () => {
 		Inputs.mockImplementation(() => ({
-			webhookUrl: 'https://example.com',
+            gchatWebhookUrl: 'https://example.com',
 			milestoneTitle: 'title',
 			milestoneDate: '2025-12-25',
 			get projectName() {
@@ -28,7 +28,7 @@ describe('plan-on-gchat', () => {
 
 	it('uses project-name', async () => {
 		inputs = {
-            webhookUrl: 'https://example.com',
+            gchatWebhookUrl: 'https://example.com',
 			milestoneTitle: 'title',
 			milestoneDate: '2025-12-25',
 			projectName: 'project'
