@@ -1,29 +1,25 @@
 const core = require('@actions/core');
+const { Inputs } = require('../src/schedule-milestone/inputs');
 const { Milestones } = require('../src/milestones');
 const run = require('../src/schedule-milestone');
 
 jest.mock('@actions/core');
 jest.mock('../src/milestones');
+jest.mock('../src/schedule-milestone/inputs');
 
 describe('schedule-milestone', () => {
 	it('schedules a milestone', async () => {
-		core.getInput.mockImplementation((name) => {
-			if (name === 'milestone-title') {
-				return 'title';
-			}
-			if (name === 'milestone-date') {
-				return '2025-12-25';
-			}
-			if (name === 'milestone-description') {
-				return 'description';
-			}
-		});
+        Inputs.mockImplementation(() => ({
+			milestoneTitle: 'title',
+            milestoneDate: '2025-12-25',
+			milestoneDescription: 'description'
+		}));
 		await run();
 		expect(Milestones.prototype.scheduleMilestone).toHaveBeenCalledWith('title', '2025-12-25', 'description');
 	});
 
 	it('handles errors', async () => {
-		core.getInput.mockImplementation(() => {
+        Milestones.prototype.scheduleMilestone.mockImplementation(() => {
 			throw new Error('error');
 		});
 		await run();

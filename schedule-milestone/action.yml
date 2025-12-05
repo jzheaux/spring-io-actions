@@ -1,22 +1,25 @@
 name: "schedule-milestone"
 description: "An action that schedules a milestone, updating it if it already exists"
 author: "jzheaux"
+
 inputs:
-  milestone-title:
-    description: "The milestone to close"
-    required: true
   milestone-date:
     description: "The milestone date"
     required: true
+  milestone-title:
+    description: "The milestone to close"
+    required: true
+
   milestone-description:
     description: "The milestone description"
     required: false
-  repository-name:
+  milestone-repository:
     description: "The repository to publish the milestone to; uses the current repository by default"
     required: false
-  repository-token:
+  milestone-token:
     description: "The GitHub token for the repository; uses the current repository's token by default"
     required: false
+
 runs:
   using: "node20"
   main: "../dist/schedule-milestone/main/index.js"
