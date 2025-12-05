@@ -1,6 +1,7 @@
 name: "push-next-development-version"
 description: "Push the next development version"
 author: "jzheaux"
+
 inputs:
   version:
     description: "The version number to use"
