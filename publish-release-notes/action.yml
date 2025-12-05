@@ -1,10 +1,12 @@
 name: "publish-release-notes"
 description: "An action that publishes the release notes, ensuring the needed tag exists"
 author: "jzheaux"
+
 inputs:
   tag:
     description: "The tag to use"
     required: true
+
   release-notes-location:
     description: "The location of the release notes file; defaults to changelog.md"
     required: false
