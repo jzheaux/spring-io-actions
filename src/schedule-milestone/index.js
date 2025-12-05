@@ -1,23 +1,26 @@
 const core = require("@actions/core");
-const {Inputs} = require("./inputs");
-const {Milestones} = require("../milestones");
+const { Inputs } = require("./inputs");
+const { Milestones } = require("../milestones");
 
 async function run() {
-    const inputs = new Inputs();
-    const milestones = new Milestones(inputs.milestoneToken, inputs.milestoneRepository);
-    try {
-        await milestones.scheduleMilestone(
-            inputs.milestoneTitle,
-            inputs.milestoneDate,
-            inputs.milestoneDescription,
-        );
-    } catch (error) {
-        core.setFailed(error.message);
-    }
+	const inputs = new Inputs();
+	const milestones = new Milestones(
+		inputs.milestoneToken,
+		inputs.milestoneRepository,
+	);
+	try {
+		await milestones.scheduleMilestone(
+			inputs.milestoneTitle,
+			inputs.milestoneDate,
+			inputs.milestoneDescription,
+		);
+	} catch (error) {
+		core.setFailed(error.message);
+	}
 }
 
 if (require.main === module) {
-    run();
+	run();
 }
 
 module.exports = run;

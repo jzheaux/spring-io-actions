@@ -32724,66 +32724,66 @@ const { Version } = __nccwpck_require__(6100);
 
 const inputs = new Inputs();
 const milestones = new Milestones(
-  inputs.milestoneToken,
-  inputs.milestoneRepository,
+	inputs.milestoneToken,
+	inputs.milestoneRepository,
 );
 const projects = new Website(inputs);
 
 async function run() {
-  const version = await _getVersion();
-  if (!version) {
-    core.setFailed(
-      `Could not find milestone ${inputs.milestoneTitle} or it has no due date.`,
-    );
-    return;
-  }
-  const generation = await _getGeneration(version);
-  if (!generation) {
-    core.setFailed(
-      `Could not find generation for version ${inputs.milestoneTitle}.`,
-    );
-    return;
-  }
-  const release = version.nextMilestone(generation);
-  if (!release) {
-    core.setFailed(
-      `Could not calculate next release for version ${inputs.milestoneTitle}.`,
-    );
-    return;
-  }
-  const nextVersion = release.version;
-  const nextVersionType = release.type;
-  const nextVersionDate = release.dueDate.toISOString().substring(0, 10);
-  console.log(
-    `Next version is ${nextVersion} (${nextVersionType}) on ${nextVersionDate}`,
-  );
-  core.setOutput("next-version", nextVersion);
-  core.setOutput("next-version-date", nextVersionDate);
-  core.setOutput("next-version-type", nextVersionType);
+	const version = await _getVersion();
+	if (!version) {
+		core.setFailed(
+			`Could not find milestone ${inputs.milestoneTitle} or it has no due date.`,
+		);
+		return;
+	}
+	const generation = await _getGeneration(version);
+	if (!generation) {
+		core.setFailed(
+			`Could not find generation for version ${inputs.milestoneTitle}.`,
+		);
+		return;
+	}
+	const release = version.nextMilestone(generation);
+	if (!release) {
+		core.setFailed(
+			`Could not calculate next release for version ${inputs.milestoneTitle}.`,
+		);
+		return;
+	}
+	const nextVersion = release.version;
+	const nextVersionType = release.type;
+	const nextVersionDate = release.dueDate.toISOString().substring(0, 10);
+	console.log(
+		`Next version is ${nextVersion} (${nextVersionType}) on ${nextVersionDate}`,
+	);
+	core.setOutput("next-version", nextVersion);
+	core.setOutput("next-version-date", nextVersionDate);
+	core.setOutput("next-version-type", nextVersionType);
 }
 
 async function _getVersion() {
-  const milestone = await milestones.findMilestoneByName(inputs.milestoneTitle);
-  if (!milestone || !milestone.dueDate) {
-    return null;
-  }
-  return Version.fromMilestone(milestone);
+	const milestone = await milestones.findMilestoneByName(inputs.milestoneTitle);
+	if (!milestone || !milestone.dueDate) {
+		return null;
+	}
+	return Version.fromMilestone(milestone);
 }
 
 async function _getGeneration(version) {
-  try {
-    return await projects.getGenerationByVersion(version);
-  } catch (error) {
-    core.setFailed(error);
-  }
+	try {
+		return await projects.getGenerationByVersion(version);
+	} catch (error) {
+		core.setFailed(error);
+	}
 }
 
 if (require.main === require.cache[eval('__filename')]) {
-  run();
+	run();
 }
 
 module.exports = {
-  run,
+	run,
 };
 
 
@@ -32795,57 +32795,57 @@ module.exports = {
 const core = __nccwpck_require__(7484);
 
 class Inputs {
-  constructor() {
-    const repository = process.env.GITHUB_REPOSITORY.split("/")[1];
-    const commercial = repository.endsWith("-commercial");
-    this._milestoneTitle = core.getInput("milestone-title", { required: true });
-    this._milestoneToken = core.getInput("milestone-token", {
-      required: true,
-    });
-    this._websiteToken = core.getInput("website-token", { required: true });
-    this._milestoneRepository =
-      core.getInput("milestone-repository") || process.env.GITHUB_REPOSITORY;
-    let websiteRepository = core.getInput("website-repository");
-    if (!websiteRepository) {
-      websiteRepository = commercial
-        ? "spring-io/spring-website-commercial-content"
-        : "spring-io/spring-website-content";
-    }
-    let projectSlug = core.getInput("project-slug");
-    if (!projectSlug) {
-      projectSlug = repository.replace("-commercial", "");
-    }
-    this._projectSlug = projectSlug;
-    this._websiteRepository = websiteRepository;
-  }
+	constructor() {
+		const repository = process.env.GITHUB_REPOSITORY.split("/")[1];
+		const commercial = repository.endsWith("-commercial");
+		this._milestoneTitle = core.getInput("milestone-title", { required: true });
+		this._milestoneToken = core.getInput("milestone-token", {
+			required: true,
+		});
+		this._websiteToken = core.getInput("website-token", { required: true });
+		this._milestoneRepository =
+			core.getInput("milestone-repository") || process.env.GITHUB_REPOSITORY;
+		let websiteRepository = core.getInput("website-repository");
+		if (!websiteRepository) {
+			websiteRepository = commercial
+				? "spring-io/spring-website-commercial-content"
+				: "spring-io/spring-website-content";
+		}
+		let projectSlug = core.getInput("project-slug");
+		if (!projectSlug) {
+			projectSlug = repository.replace("-commercial", "");
+		}
+		this._projectSlug = projectSlug;
+		this._websiteRepository = websiteRepository;
+	}
 
-  get milestoneTitle() {
-    return this._milestoneTitle;
-  }
+	get milestoneTitle() {
+		return this._milestoneTitle;
+	}
 
-  get milestoneToken() {
-    return this._milestoneToken;
-  }
+	get milestoneToken() {
+		return this._milestoneToken;
+	}
 
-  get websiteToken() {
-    return this._websiteToken;
-  }
+	get websiteToken() {
+		return this._websiteToken;
+	}
 
-  get milestoneRepository() {
-    return this._milestoneRepository;
-  }
+	get milestoneRepository() {
+		return this._milestoneRepository;
+	}
 
-  get projectSlug() {
-    return this._projectSlug;
-  }
+	get projectSlug() {
+		return this._projectSlug;
+	}
 
-  get websiteRepository() {
-    return this._websiteRepository;
-  }
+	get websiteRepository() {
+		return this._websiteRepository;
+	}
 }
 
 module.exports = {
-  Inputs,
+	Inputs,
 };
 
 
@@ -32855,38 +32855,38 @@ module.exports = {
 /***/ ((module) => {
 
 function getWeekOfMonthAndDayOfWeek(releaseDate) {
-  const dayOfMonth = releaseDate.getDate();
-  const dayOfWeek = releaseDate.getDay();
-  const firstOfMonth = new Date(
-    releaseDate.getFullYear(),
-    releaseDate.getMonth(),
-    1,
-  );
-  const firstDayOfMonth = firstOfMonth.getDay();
-  const firstDayMonBased = (firstDayOfMonth + 6) % 7;
-  const offsetToFirstMonday = (7 - firstDayMonBased) % 7;
-  const firstFullWeekMonday = 1 + offsetToFirstMonday;
-  const weekOfMonth = Math.floor((dayOfMonth - firstFullWeekMonday) / 7);
-  return { dayOfWeek, weekOfMonth };
+	const dayOfMonth = releaseDate.getDate();
+	const dayOfWeek = releaseDate.getDay();
+	const firstOfMonth = new Date(
+		releaseDate.getFullYear(),
+		releaseDate.getMonth(),
+		1,
+	);
+	const firstDayOfMonth = firstOfMonth.getDay();
+	const firstDayMonBased = (firstDayOfMonth + 6) % 7;
+	const offsetToFirstMonday = (7 - firstDayMonBased) % 7;
+	const firstFullWeekMonday = 1 + offsetToFirstMonday;
+	const weekOfMonth = Math.floor((dayOfMonth - firstFullWeekMonday) / 7);
+	return { dayOfWeek, weekOfMonth };
 }
 
 function getReleaseDate(month, year, dayOfWeek, weekOfMonth) {
-  const firstOfMonth = new Date(year, month, 1);
-  const firstDayOfMonth = firstOfMonth.getDay();
-  const firstDayMonBased = (firstDayOfMonth + 6) % 7;
-  const offsetToFirstMonday = (7 - firstDayMonBased) % 7;
-  const firstFullWeekMonday = 1 + offsetToFirstMonday;
-  const inputDayMonBased = (dayOfWeek + 6) % 7;
-  const dayOfMonth = firstFullWeekMonday + weekOfMonth * 7 + inputDayMonBased;
-  return new Date(year, month, dayOfMonth);
+	const firstOfMonth = new Date(year, month, 1);
+	const firstDayOfMonth = firstOfMonth.getDay();
+	const firstDayMonBased = (firstDayOfMonth + 6) % 7;
+	const offsetToFirstMonday = (7 - firstDayMonBased) % 7;
+	const firstFullWeekMonday = 1 + offsetToFirstMonday;
+	const inputDayMonBased = (dayOfWeek + 6) % 7;
+	const dayOfMonth = firstFullWeekMonday + weekOfMonth * 7 + inputDayMonBased;
+	return new Date(year, month, dayOfMonth);
 }
 
 const mod = (a, n) => ((a % n) + n) % n;
 
 module.exports = {
-  getWeekOfMonthAndDayOfWeek,
-  getReleaseDate,
-  mod,
+	getWeekOfMonthAndDayOfWeek,
+	getReleaseDate,
+	mod,
 };
 
 
@@ -32906,95 +32906,93 @@ const { Octokit } = __nccwpck_require__(5772);
  * @author Josh Cummings
  */
 class Milestones {
-  /**
-   * @param token the GH token needed to query milestones
-   * @param repo the GH repository, like {@code spring-projects/spring-security} to operate on
-   */
-  constructor(token, repo) {
-    this.gh = new Octokit({ auth: token });
-    this.owner = repo.split("/")[0];
-    this.repo = repo.split("/")[1];
-    this.milestoneType = this.repo.endsWith("-commercial")
-      ? "enterprise"
-      : "oss";
-  }
+	/**
+	 * @param token the GH token needed to query milestones
+	 * @param repo the GH repository, like {@code spring-projects/spring-security} to operate on
+	 */
+	constructor(token, repo) {
+		this.gh = new Octokit({ auth: token });
+		this.owner = repo.split("/")[0];
+		this.repo = repo.split("/")[1];
+		this.milestoneType = this.repo.endsWith("-commercial") ? "enterprise" : "oss";
+	}
 
-  /**
-   * Find milestone by {@code title} regardless of state
-   *
-   * @param {string} title
-   * @returns {Promise<null | { number: number, name: string, dueDate: Date | null }>}
-   */
-  async findMilestoneByTitle(title) {
-    const { data: milestones } = await this.gh.rest.issues.listMilestones({
-      owner: this.owner,
-      repo: this.repo,
-      state: "all",
-      per_page: 100,
-    });
+	/**
+	 * Find milestone by {@code title} regardless of state
+	 *
+	 * @param {string} title
+	 * @returns {Promise<null | { number: number, name: string, dueDate: Date | null }>}
+	 */
+	async findMilestoneByTitle(title) {
+		const { data: milestones } = await this.gh.rest.issues.listMilestones({
+			owner: this.owner,
+			repo: this.repo,
+			state: "all",
+			per_page: 100,
+		});
 
-    const m = milestones.find((m) => m.title === title);
-    if (!m) {
-      return null;
-    }
+		const m = milestones.find((m) => m.title === title);
+		if (!m) {
+			return null;
+		}
 
-    return {
-      number: m.number,
-      name: m.title,
-      dueDate: m.due_on ? new Date(m.due_on) : null,
-      type: this.milestoneType,
-    };
-  }
+		return {
+			number: m.number,
+			name: m.title,
+			dueDate: m.due_on ? new Date(m.due_on) : null,
+			type: this.milestoneType,
+		};
+	}
 
-  /**
-   * Close a milestone, if it exists
-   * @param title the milestone title
-   * @returns {Promise<void>}
-   */
-  async closeMilestone(title) {
-    const milestone = await this.findMilestoneByTitle(title);
-    if (milestone) {
-      await this.gh.rest.issues.updateMilestone({
-        owner: this.owner,
-        repo: this.repo,
-        milestone_number: milestone.number,
-        state: "closed",
-      });
-    }
-  }
+	/**
+	 * Close a milestone, if it exists
+	 * @param title the milestone title
+	 * @returns {Promise<void>}
+	 */
+	async closeMilestone(title) {
+		const milestone = await this.findMilestoneByTitle(title);
+		if (milestone) {
+			await this.gh.rest.issues.updateMilestone({
+				owner: this.owner,
+				repo: this.repo,
+				milestone_number: milestone.number,
+				state: "closed",
+			});
+		}
+	}
 
-  /**
-   * Schedule a milestone or update the existing one
-   * @param title the milestone title
-   * @param date the milestone due date
-   * @param description the milestone description
-   * @returns {Promise<void>}
-   */
-  async scheduleMilestone(title, date, description) {
-    const milestone = await this.findMilestoneByTitle(title);
-    const dueDate = new Date(date).toISOString();
-    if (milestone) {
-      await this.gh.rest.issues.updateMilestone({
-        owner: this.owner,
-        repo: this.repo,
-        milestone_number: milestone.number,
-        due_on: dueDate,
-        description: description,
-      });
-    } else {
-      await this.gh.rest.issues.createMilestone({
-        owner: this.owner,
-        repo: this.repo,
-        title: title,
-        due_on: dueDate,
-        description: description,
-      });
-    }
-  }
+	/**
+	 * Schedule a milestone or update the existing one
+	 * @param title the milestone title
+	 * @param date the milestone due date
+	 * @param description the milestone description
+	 * @returns {Promise<void>}
+	 */
+	async scheduleMilestone(title, date, description) {
+		const milestone = await this.findMilestoneByTitle(title);
+		const dueDate = new Date(date).toISOString();
+		if (milestone) {
+			await this.gh.rest.issues.updateMilestone({
+				owner: this.owner,
+				repo: this.repo,
+				milestone_number: milestone.number,
+				due_on: dueDate,
+				description: description,
+			});
+		} else {
+			await this.gh.rest.issues.createMilestone({
+				owner: this.owner,
+				repo: this.repo,
+				title: title,
+				due_on: dueDate,
+				description: description,
+			});
+		}
+	}
 }
 
 module.exports = {
-  Milestones,
+	Milestones,
 };
 
 
@@ -33006,11 +33004,11 @@ module.exports = {
 const { getReleaseDate, mod } = __nccwpck_require__(1482);
 
 const releaseTrainMonths = {
-  M1: [0, 6],
-  M2: [1, 7],
-  M3: [2, 8],
-  RC1: [3, 9],
-  "": [4, 10],
+	M1: [0, 6],
+	M2: [1, 7],
+	M3: [2, 8],
+	RC1: [3, 9],
+	"": [4, 10],
 };
 
 /**
@@ -33019,225 +33017,223 @@ const releaseTrainMonths = {
  * @author Josh Cummings
  */
 class Version {
-  constructor(version, dueDate = new Date(), type = "oss") {
-    this._version = version;
-    this._dueDate = dueDate;
-    this._type = type;
-    const parts = version.split(/[.-]/);
-    this._major = parseInt(parts[0], 10);
-    this._minor = parseInt(parts[1], 10);
-    this._patch = parseInt(parts[2], 10);
-    this._classifier = parts.length === 3 ? "" : parts[3];
-  }
+	constructor(version, dueDate = new Date(), type = "oss") {
+		this._version = version;
+		this._dueDate = dueDate;
+		this._type = type;
+		const parts = version.split(/[.-]/);
+		this._major = parseInt(parts[0], 10);
+		this._minor = parseInt(parts[1], 10);
+		this._patch = parseInt(parts[2], 10);
+		this._classifier = parts.length === 3 ? "" : parts[3];
+	}
 
-  /**
-   * Construct a {@linkcode Version} instance based on a {@linkcode Milestones}
-   * value.
-   *
-   * @param milestone a milestone acquired from {@linkcode Milestones}
-   * @returns {Version}
-   */
-  static fromMilestone(milestone) {
-    return new Version(milestone.name, milestone.dueDate, milestone.type);
-  }
+	/**
+	 * Construct a {@linkcode Version} instance based on a {@linkcode Milestones}
+	 * value.
+	 *
+	 * @param milestone a milestone acquired from {@linkcode Milestones}
+	 * @returns {Version}
+	 */
+	static fromMilestone(milestone) {
+		return new Version(milestone.name, milestone.dueDate, milestone.type);
+	}
 
-  get version() {
-    return this._version;
-  }
+	get version() {
+		return this._version;
+	}
 
-  get major() {
-    return this._major;
-  }
+	get major() {
+		return this._major;
+	}
 
-  get minor() {
-    return this._minor;
-  }
+	get minor() {
+		return this._minor;
+	}
 
-  get patch() {
-    return this._patch;
-  }
+	get patch() {
+		return this._patch;
+	}
 
-  get classifier() {
-    return this._classifier;
-  }
+	get classifier() {
+		return this._classifier;
+	}
 
-  get dueDate() {
-    return this._dueDate;
-  }
+	get dueDate() {
+		return this._dueDate;
+	}
 
-  get type() {
-    return this._type;
-  }
+	get type() {
+		return this._type;
+	}
 
-  /**
-   * Whether this version is a snapshot version
-   * @returns {boolean}
-   */
-  get snapshot() {
-    return this._classifier === "SNAPSHOT";
-  }
+	/**
+	 * Whether this version is a snapshot version
+	 * @returns {boolean}
+	 */
+	get snapshot() {
+		return this._classifier === "SNAPSHOT";
+	}
 
-  /**
-   * Whether this version is a pre-release version, like RC1 or M2
-   * @returns {boolean}
-   */
-  get prerelease() {
-    return !!(this._classifier && this._classifier !== "SNAPSHOT");
-  }
+	/**
+	 * Whether this version is a pre-release version, like RC1 or M2
+	 * @returns {boolean}
+	 */
+	get prerelease() {
+		return !!(this._classifier && this._classifier !== "SNAPSHOT");
+	}
 
-  /**
-   * Whether this version is a GA version
-   * @returns {boolean}
-   */
-  get ga() {
-    return !this._classifier;
-  }
+	/**
+	 * Whether this version is a GA version
+	 * @returns {boolean}
+	 */
+	get ga() {
+		return !this._classifier;
+	}
 
-  /**
-   * Get the next milestone that follows after this version;
-   * returns {@code null} if given a snapshot version
-   *
-   * @param generation generation detail from {@linkcode Website}
-   * @returns {Version|null}
-   */
-  nextMilestone(generation) {
-    if (this.snapshot) {
-      return null;
-    }
-    if (this.ga) {
-      return _nextGa(this, generation);
-    }
-    return _nextMilestone(this, generation);
-  }
+	/**
+	 * Get the next milestone that follows after this version;
+	 * returns {@code null} if given a snapshot version
+	 *
+	 * @param generation generation detail from {@linkcode Website}
+	 * @returns {Version|null}
+	 */
+	nextMilestone(generation) {
+		if (this.snapshot) {
+			return null;
+		}
+		if (this.ga) {
+			return _nextGa(this, generation);
+		}
+		return _nextMilestone(this, generation);
+	}
 
-  /**
-   * Get the next snapshot that follows after this version.
-   *
-   * @returns {Version}
-   */
-  nextSnapshot() {
-    return _nextSnapshot(this);
-  }
+	/**
+	 * Get the next snapshot that follows after this version.
+	 *
+	 * @returns {Version}
+	 */
+	nextSnapshot() {
+		return _nextSnapshot(this);
+	}
 
-  /**
-   * Check if this version is the same major/minor generation as
-   * {@code other}
-   * @param other the version to compare to
-   * @returns {boolean}
-   */
-  isSameMajorMinor(other) {
-    return this.major === other.major && this.minor === other.minor;
-  }
+	/**
+	 * Check if this version is the same major/minor generation as
+	 * {@code other}
+	 * @param other the version to compare to
+	 * @returns {boolean}
+	 */
+	isSameMajorMinor(other) {
+		return this.major === other.major && this.minor === other.minor;
+	}
 }
 
 function _nextGa(v, generation) {
-  const next = _nextGaDate(v, generation);
-  if (!next) {
-    return null;
-  }
-  return new Version(_nextGaVersion(v), next.dueDate, next.type);
+	const next = _nextGaDate(v, generation);
+	if (!next) {
+		return null;
+	}
+	return new Version(_nextGaVersion(v), next.dueDate, next.type);
 }
 
 function _nextGaVersion(version) {
-  return `${version._major}.${version._minor}.${version._patch + 1}`;
+	return `${version._major}.${version._minor}.${version._patch + 1}`;
 }
 
 function _nextGaDate(version, generation) {
-  const currentMonth = version.dueDate.getMonth();
-  const currentYear = version.dueDate.getFullYear();
-  const oss = generation.oss;
-  const enterprise = generation.enterprise;
+	const currentMonth = version.dueDate.getMonth();
+	const currentYear = version.dueDate.getFullYear();
+	const oss = generation.oss;
+	const enterprise = generation.enterprise;
 
-  let releaseMonth =
-    currentMonth +
-    oss.frequency -
-    ((currentMonth - oss.offset) % oss.frequency);
-  let releaseYear = currentYear + Math.floor(releaseMonth / 12);
-  releaseMonth = mod(releaseMonth, 12);
+	let releaseMonth =
+		currentMonth + oss.frequency - ((currentMonth - oss.offset) % oss.frequency);
+	let releaseYear = currentYear + Math.floor(releaseMonth / 12);
+	releaseMonth = mod(releaseMonth, 12);
 
-  if (releaseMonth <= oss.end.month && releaseYear <= oss.end.year) {
-    const dueDate = getReleaseDate(
-      releaseMonth,
-      releaseYear,
-      generation.dayOfWeek,
-      generation.weekOfMonth,
-    );
-    return { dueDate, type: "oss" };
-  }
+	if (releaseMonth <= oss.end.month && releaseYear <= oss.end.year) {
+		const dueDate = getReleaseDate(
+			releaseMonth,
+			releaseYear,
+			generation.dayOfWeek,
+			generation.weekOfMonth,
+		);
+		return { dueDate, type: "oss" };
+	}
 
-  releaseMonth =
-    currentMonth +
-    enterprise.frequency -
-    ((currentMonth - enterprise.offset) % enterprise.frequency);
-  releaseYear = currentYear + Math.floor(releaseMonth / 12);
-  releaseMonth = mod(releaseMonth, 12);
+	releaseMonth =
+		currentMonth +
+		enterprise.frequency -
+		((currentMonth - enterprise.offset) % enterprise.frequency);
+	releaseYear = currentYear + Math.floor(releaseMonth / 12);
+	releaseMonth = mod(releaseMonth, 12);
 
-  if (
-    releaseMonth <= enterprise.end.month &&
-    releaseYear <= enterprise.end.year
-  ) {
-    const dueDate = getReleaseDate(
-      releaseMonth,
-      releaseYear,
-      generation.dayOfWeek,
-      generation.weekOfMonth,
-    );
-    return { dueDate, type: "enterprise" };
-  }
+	if (
+		releaseMonth <= enterprise.end.month &&
+		releaseYear <= enterprise.end.year
+	) {
+		const dueDate = getReleaseDate(
+			releaseMonth,
+			releaseYear,
+			generation.dayOfWeek,
+			generation.weekOfMonth,
+		);
+		return { dueDate, type: "enterprise" };
+	}
 
-  return null;
+	return null;
 }
 
 function _nextMilestone(v, generation) {
-  const nextVersion = new Version(_nextMilestoneVersion(v), v.dueDate, v.type);
-  const nextDate = _nextMilestoneDate(nextVersion, generation);
-  return new Version(nextVersion.version, nextDate, v.type);
+	const nextVersion = new Version(_nextMilestoneVersion(v), v.dueDate, v.type);
+	const nextDate = _nextMilestoneDate(nextVersion, generation);
+	return new Version(nextVersion.version, nextDate, v.type);
 }
 
 function _nextMilestoneVersion(version) {
-  if (version._classifier === "M1") {
-    return `${version._major}.${version._minor}.${version._patch}-M2`;
-  }
-  if (version._classifier === "M2") {
-    return `${version._major}.${version._minor}.${version._patch}-M3`;
-  }
-  if (version._classifier.startsWith("M")) {
-    return `${version._major}.${version._minor}.${version._patch}-RC1`;
-  }
-  return `${version._major}.${version._minor}.${version._patch}`;
+	if (version._classifier === "M1") {
+		return `${version._major}.${version._minor}.${version._patch}-M2`;
+	}
+	if (version._classifier === "M2") {
+		return `${version._major}.${version._minor}.${version._patch}-M3`;
+	}
+	if (version._classifier.startsWith("M")) {
+		return `${version._major}.${version._minor}.${version._patch}-RC1`;
+	}
+	return `${version._major}.${version._minor}.${version._patch}`;
 }
 
 function _nextMilestoneDate(version, generation) {
-  const currentMonth = version.dueDate.getMonth();
-  const candidateMonths = releaseTrainMonths[version._classifier];
-  const index =
-    mod(candidateMonths[0] - currentMonth, 12) <
-    mod(candidateMonths[1] - currentMonth, 12)
-      ? 0
-      : 1;
-  const month = candidateMonths[index];
-  const year = version.dueDate.getFullYear() + (month < currentMonth);
-  return getReleaseDate(
-    month,
-    year,
-    generation.dayOfWeek,
-    generation.weekOfMonth,
-  );
+	const currentMonth = version.dueDate.getMonth();
+	const candidateMonths = releaseTrainMonths[version._classifier];
+	const index =
+		mod(candidateMonths[0] - currentMonth, 12) <
+		mod(candidateMonths[1] - currentMonth, 12)
+			? 0
+			: 1;
+	const month = candidateMonths[index];
+	const year = version.dueDate.getFullYear() + (month < currentMonth);
+	return getReleaseDate(
+		month,
+		year,
+		generation.dayOfWeek,
+		generation.weekOfMonth,
+	);
 }
 
 function _nextSnapshot(version) {
-  if (version.ga) {
-    return new Version(
-      `${version.major}.${version.minor}.${version.patch + 1}-SNAPSHOT`,
-    );
-  }
-  return new Version(
-    `${version.major}.${version.minor}.${version.patch}-SNAPSHOT`,
-  );
+	if (version.ga) {
+		return new Version(
+			`${version.major}.${version.minor}.${version.patch + 1}-SNAPSHOT`,
+		);
+	}
+	return new Version(
+		`${version.major}.${version.minor}.${version.patch}-SNAPSHOT`,
+	);
 }
 
 module.exports = {
-  Version,
+	Version,
 };
 
 
@@ -33256,88 +33252,88 @@ const { getWeekOfMonthAndDayOfWeek } = __nccwpck_require__(1482);
  * @author Josh Cummings
  */
 class Website {
-  constructor(inputs) {
-    this.gh = new Octokit({ auth: inputs.websiteToken });
-    this.owner = inputs.websiteRepository.split("/")[0];
-    this.repo = inputs.websiteRepository.split("/")[1];
-    this.projectSlug = inputs.projectSlug;
-  }
+	constructor(inputs) {
+		this.gh = new Octokit({ auth: inputs.websiteToken });
+		this.owner = inputs.websiteRepository.split("/")[0];
+		this.repo = inputs.websiteRepository.split("/")[1];
+		this.projectSlug = inputs.projectSlug;
+	}
 
-  /**
-   * Look up generate data using the major and minor version numbers in
-   * the supplied {@linkcode Version}.
-   * @param version
-   * @returns {Promise<{generation: {major: number, minor: number}, dayOfWeek: *, weekOfMonth: number, oss: {frequency: number, offset: number, end: {year: number, month: number}}, enterprise: {frequency: number, offset: number, end: {year: number, month: number}}}|null>}
-   */
-  async getGenerationByVersion(version) {
-    const file = await _load(
-      this.gh,
-      this.owner,
-      this.repo,
-      `/project/${this.projectSlug}/generations.json`,
-    );
-    const asStrings = JSON.parse(file);
-    const { dayOfWeek, weekOfMonth } = getWeekOfMonthAndDayOfWeek(
-      version.dueDate,
-    );
-    for (const generation of asStrings.generations) {
-      console.log(
-        `Checking generation ${generation.generation} against ${version.major}.${version.minor}`,
-      );
-      const majorMinor = _generation(generation.generation);
-      if (version.isSameMajorMinor(majorMinor)) {
-        return {
-          generation: majorMinor,
-          dayOfWeek,
-          weekOfMonth,
-          oss: {
-            frequency: 1,
-            offset: 0,
-            end: _date(generation.ossSupportEnd),
-          },
-          enterprise: {
-            frequency: 3,
-            offset: 1,
-            end: _date(generation.enterpriseSupportEnd),
-          },
-        };
-      }
-    }
-    return null;
-  }
+	/**
+	 * Look up generate data using the major and minor version numbers in
+	 * the supplied {@linkcode Version}.
+	 * @param version
+	 * @returns {Promise<{generation: {major: number, minor: number}, dayOfWeek: *, weekOfMonth: number, oss: {frequency: number, offset: number, end: {year: number, month: number}}, enterprise: {frequency: number, offset: number, end: {year: number, month: number}}}|null>}
+	 */
+	async getGenerationByVersion(version) {
+		const file = await _load(
+			this.gh,
+			this.owner,
+			this.repo,
+			`/project/${this.projectSlug}/generations.json`,
+		);
+		const asStrings = JSON.parse(file);
+		const { dayOfWeek, weekOfMonth } = getWeekOfMonthAndDayOfWeek(
+			version.dueDate,
+		);
+		for (const generation of asStrings.generations) {
+			console.log(
+				`Checking generation ${generation.generation} against ${version.major}.${version.minor}`,
+			);
+			const majorMinor = _generation(generation.generation);
+			if (version.isSameMajorMinor(majorMinor)) {
+				return {
+					generation: majorMinor,
+					dayOfWeek,
+					weekOfMonth,
+					oss: {
+						frequency: 1,
+						offset: 0,
+						end: _date(generation.ossSupportEnd),
+					},
+					enterprise: {
+						frequency: 3,
+						offset: 1,
+						end: _date(generation.enterpriseSupportEnd),
+					},
+				};
+			}
+		}
+		return null;
+	}
 }
 
 async function _load(gh, owner, repo, path, ref = "main") {
-  try {
-    console.log(`Retrieving ${path} from ${owner}/${repo}@${ref}`);
-    const response = await gh.repos.getContent({
-      owner,
-      repo,
-      path,
-      ref,
-    });
+	try {
+		console.log(`Retrieving ${path} from ${owner}/${repo}@${ref}`);
+		const response = await gh.repos.getContent({
+			owner,
+			repo,
+			path,
+			ref,
+		});
 
-    // The content is returned in base64 encoding
-    const encodedContent = response.data.content;
-    return Base64.decode(encodedContent);
-  } catch (error) {
-    console.error("Error retrieving file content:", error);
-    throw error;
-  }
+		// The content is returned in base64 encoding
+		const encodedContent = response.data.content;
+		return Base64.decode(encodedContent);
+	} catch (error) {
+		console.error("Error retrieving file content:", error);
+		throw error;
+	}
 }
 
 function _generation(generation) {
-  const parts = generation.split(/[.-]/);
-  return { major: parseInt(parts[0]), minor: parseInt(parts[1]) };
+	const parts = generation.split(/[.-]/);
+	return { major: parseInt(parts[0]), minor: parseInt(parts[1]) };
 }
 
 function _date(date) {
-  const parts = date.split(/[.-]/);
-  return { year: parseInt(parts[0]), month: parseInt(parts[1]) };
+	const parts = date.split(/[.-]/);
+	return { year: parseInt(parts[0]), month: parseInt(parts[1]) };
 }
 
 module.exports = {
-  Website,
+	Website,
 };
 
 

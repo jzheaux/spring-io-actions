@@ -32628,82 +32628,82 @@ const { compareVersions } = __nccwpck_require__(2026);
 const { Version } = __nccwpck_require__(6100);
 
 class Entry {
-  constructor(version, isAntora, referenceDocUrl, apiDocUrl, current = false) {
-    this.version = version;
-    this.isAntora = isAntora;
-    this.referenceDocUrl = referenceDocUrl;
-    this.apiDocUrl = apiDocUrl;
-    this.current = current;
-  }
+	constructor(version, isAntora, referenceDocUrl, apiDocUrl, current = false) {
+		this.version = version;
+		this.isAntora = isAntora;
+		this.referenceDocUrl = referenceDocUrl;
+		this.apiDocUrl = apiDocUrl;
+		this.current = current;
+	}
 
-  get status() {
-    if (this.version.ga) {
-      return "GENERAL_AVAILABILITY";
-    }
-    if (this.version.prerelease) {
-      return "PRERELEASE";
-    }
-    return "SNAPSHOT";
-  }
+	get status() {
+		if (this.version.ga) {
+			return "GENERAL_AVAILABILITY";
+		}
+		if (this.version.prerelease) {
+			return "PRERELEASE";
+		}
+		return "SNAPSHOT";
+	}
 
-  toJSON() {
-    return {
-      version: this.version.version,
-      isAntora: this.isAntora,
-      referenceDocUrl: this.referenceDocUrl,
-      apiDocUrl: this.apiDocUrl,
-      status: this.status,
-      current: this.current,
-    };
-  }
+	toJSON() {
+		return {
+			version: this.version.version,
+			isAntora: this.isAntora,
+			referenceDocUrl: this.referenceDocUrl,
+			apiDocUrl: this.apiDocUrl,
+			status: this.status,
+			current: this.current,
+		};
+	}
 }
 
 class LearnPage {
-  constructor(jsonContent = "[]") {
-    this._entries = JSON.parse(jsonContent).map((entry) => {
-      const version = new Version(entry.version);
-      return new Entry(
-        version,
-        entry.isAntora,
-        entry.referenceDocUrl,
-        entry.apiDocUrl,
-        entry.current,
-      );
-    });
-  }
+	constructor(jsonContent = "[]") {
+		this._entries = JSON.parse(jsonContent).map((entry) => {
+			const version = new Version(entry.version);
+			return new Entry(
+				version,
+				entry.isAntora,
+				entry.referenceDocUrl,
+				entry.apiDocUrl,
+				entry.current,
+			);
+		});
+	}
 
-  get entries() {
-    return this._entries;
-  }
+	get entries() {
+		return this._entries;
+	}
 
-  set entries(entries) {
-    this._entries = entries;
-    this._sortAndMarkCurrent();
-  }
+	set entries(entries) {
+		this._entries = entries;
+		this._sortAndMarkCurrent();
+	}
 
-  _sortAndMarkCurrent() {
-    this._entries.sort((a, b) =>
-      compareVersions(b.version.version, a.version.version),
-    );
-    let foundCurrent = false;
-    for (const entry of this._entries) {
-      if (entry.status === "GENERAL_AVAILABILITY" && !foundCurrent) {
-        entry.current = true;
-        foundCurrent = true;
-      } else {
-        entry.current = false;
-      }
-    }
-  }
+	_sortAndMarkCurrent() {
+		this._entries.sort((a, b) =>
+			compareVersions(b.version.version, a.version.version),
+		);
+		let foundCurrent = false;
+		for (const entry of this._entries) {
+			if (entry.status === "GENERAL_AVAILABILITY" && !foundCurrent) {
+				entry.current = true;
+				foundCurrent = true;
+			} else {
+				entry.current = false;
+			}
+		}
+	}
 
-  toString() {
-    return JSON.stringify(this._entries, null, 2) + "\n";
-  }
+	toString() {
+		return JSON.stringify(this._entries, null, 2) + "\n";
+	}
 }
 
 module.exports = {
-  Entry,
-  LearnPage,
+	Entry,
+	LearnPage,
 };
 
 
@@ -32713,38 +32713,38 @@ module.exports = {
 /***/ ((module) => {
 
 function getWeekOfMonthAndDayOfWeek(releaseDate) {
-  const dayOfMonth = releaseDate.getDate();
-  const dayOfWeek = releaseDate.getDay();
-  const firstOfMonth = new Date(
-    releaseDate.getFullYear(),
-    releaseDate.getMonth(),
-    1,
-  );
-  const firstDayOfMonth = firstOfMonth.getDay();
-  const firstDayMonBased = (firstDayOfMonth + 6) % 7;
-  const offsetToFirstMonday = (7 - firstDayMonBased) % 7;
-  const firstFullWeekMonday = 1 + offsetToFirstMonday;
-  const weekOfMonth = Math.floor((dayOfMonth - firstFullWeekMonday) / 7);
-  return { dayOfWeek, weekOfMonth };
+	const dayOfMonth = releaseDate.getDate();
+	const dayOfWeek = releaseDate.getDay();
+	const firstOfMonth = new Date(
+		releaseDate.getFullYear(),
+		releaseDate.getMonth(),
+		1,
+	);
+	const firstDayOfMonth = firstOfMonth.getDay();
+	const firstDayMonBased = (firstDayOfMonth + 6) % 7;
+	const offsetToFirstMonday = (7 - firstDayMonBased) % 7;
+	const firstFullWeekMonday = 1 + offsetToFirstMonday;
+	const weekOfMonth = Math.floor((dayOfMonth - firstFullWeekMonday) / 7);
+	return { dayOfWeek, weekOfMonth };
 }
 
 function getReleaseDate(month, year, dayOfWeek, weekOfMonth) {
-  const firstOfMonth = new Date(year, month, 1);
-  const firstDayOfMonth = firstOfMonth.getDay();
-  const firstDayMonBased = (firstDayOfMonth + 6) % 7;
-  const offsetToFirstMonday = (7 - firstDayMonBased) % 7;
-  const firstFullWeekMonday = 1 + offsetToFirstMonday;
-  const inputDayMonBased = (dayOfWeek + 6) % 7;
-  const dayOfMonth = firstFullWeekMonday + weekOfMonth * 7 + inputDayMonBased;
-  return new Date(year, month, dayOfMonth);
+	const firstOfMonth = new Date(year, month, 1);
+	const firstDayOfMonth = firstOfMonth.getDay();
+	const firstDayMonBased = (firstDayOfMonth + 6) % 7;
+	const offsetToFirstMonday = (7 - firstDayMonBased) % 7;
+	const firstFullWeekMonday = 1 + offsetToFirstMonday;
+	const inputDayMonBased = (dayOfWeek + 6) % 7;
+	const dayOfMonth = firstFullWeekMonday + weekOfMonth * 7 + inputDayMonBased;
+	return new Date(year, month, dayOfMonth);
 }
 
 const mod = (a, n) => ((a % n) + n) % n;
 
 module.exports = {
-  getWeekOfMonthAndDayOfWeek,
-  getReleaseDate,
-  mod,
+	getWeekOfMonthAndDayOfWeek,
+	getReleaseDate,
+	mod,
 };
 
 
@@ -32760,77 +32760,77 @@ const { Entry, LearnPage } = __nccwpck_require__(3371);
 const { Version } = __nccwpck_require__(6100);
 
 async function run() {
-  const inputs = new Inputs();
-  if (inputs.milestoneTitle.endsWith("-SNAPSHOT")) {
-    core.setFailed(
-      "Please specify a non-SNAPSHOT release version to publish; it's accompanying SNAPSHOT version will also be published",
-    );
-    return;
-  }
-  const octokit = new Octokit({ auth: inputs.websiteToken });
-  const [owner, repo] = inputs.websiteRepository.split("/");
-  const path = `project/${inputs.projectSlug}/documentation.json`;
-  const ref = "main";
+	const inputs = new Inputs();
+	if (inputs.milestoneTitle.endsWith("-SNAPSHOT")) {
+		core.setFailed(
+			"Please specify a non-SNAPSHOT release version to publish; it's accompanying SNAPSHOT version will also be published",
+		);
+		return;
+	}
+	const octokit = new Octokit({ auth: inputs.websiteToken });
+	const [owner, repo] = inputs.websiteRepository.split("/");
+	const path = `project/${inputs.projectSlug}/documentation.json`;
+	const ref = "main";
 
-  let file;
-  try {
-    console.log(`Retrieving ${path} from ${owner}/${repo}@${ref}`);
-    const response = await octokit.repos.getContent({ owner, repo, path, ref });
-    file = {
-      content: Buffer.from(response.data.content, "base64").toString(),
-      sha: response.data.sha,
-    };
-  } catch (error) {
-    if (error.status !== 404) {
-      core.setFailed(`Error getting file content: ${error.message}`);
-      return;
-    }
-  }
+	let file;
+	try {
+		console.log(`Retrieving ${path} from ${owner}/${repo}@${ref}`);
+		const response = await octokit.repos.getContent({ owner, repo, path, ref });
+		file = {
+			content: Buffer.from(response.data.content, "base64").toString(),
+			sha: response.data.sha,
+		};
+	} catch (error) {
+		if (error.status !== 404) {
+			core.setFailed(`Error getting file content: ${error.message}`);
+			return;
+		}
+	}
 
-  const learnPage = new LearnPage(file ? file.content : "[]");
-  const version = new Version(inputs.milestoneTitle);
-  const refDocUrl = inputs.refDocUrl.replace(
-    /{project}|{slug}/g,
-    inputs.projectSlug,
-  );
-  const apiDocUrl = inputs.apiDocUrl.replace(
-    /{project}|{slug}/g,
-    inputs.projectSlug,
-  );
+	const learnPage = new LearnPage(file ? file.content : "[]");
+	const version = new Version(inputs.milestoneTitle);
+	const refDocUrl = inputs.refDocUrl.replace(
+		/{project}|{slug}/g,
+		inputs.projectSlug,
+	);
+	const apiDocUrl = inputs.apiDocUrl.replace(
+		/{project}|{slug}/g,
+		inputs.projectSlug,
+	);
 
-  const latestEntry = new Entry(version, inputs.isAntora, refDocUrl, apiDocUrl);
+	const latestEntry = new Entry(version, inputs.isAntora, refDocUrl, apiDocUrl);
 
-  if (inputs.commercial) {
-    learnPage.entries = [latestEntry, ...learnPage.entries];
-  } else {
-    const snapshot = version.nextSnapshot();
-    const snapshotEntry = new Entry(
-      snapshot,
-      inputs.isAntora,
-      refDocUrl,
-      apiDocUrl,
-    );
+	if (inputs.commercial) {
+		learnPage.entries = [latestEntry, ...learnPage.entries];
+	} else {
+		const snapshot = version.nextSnapshot();
+		const snapshotEntry = new Entry(
+			snapshot,
+			inputs.isAntora,
+			refDocUrl,
+			apiDocUrl,
+		);
 
-    const filtered = learnPage.entries.filter(
-      (e) => !e.version.isSameMajorMinor(version),
-    );
-    learnPage.entries = [latestEntry, snapshotEntry, ...filtered];
-  }
+		const filtered = learnPage.entries.filter(
+			(e) => !e.version.isSameMajorMinor(version),
+		);
+		learnPage.entries = [latestEntry, snapshotEntry, ...filtered];
+	}
 
-  const updatedContent = Buffer.from(learnPage.toString()).toString("base64");
-  const message = `Update #learn Page for ${inputs.projectName} ${inputs.milestoneTitle}`;
-  await octokit.repos.createOrUpdateFileContents({
-    owner,
-    repo,
-    path,
-    message,
-    content: updatedContent,
-    sha: file ? file.sha : undefined,
-  });
+	const updatedContent = Buffer.from(learnPage.toString()).toString("base64");
+	const message = `Update #learn Page for ${inputs.projectName} ${inputs.milestoneTitle}`;
+	await octokit.repos.createOrUpdateFileContents({
+		owner,
+		repo,
+		path,
+		message,
+		content: updatedContent,
+		sha: file ? file.sha : undefined,
+	});
 }
 
 if (require.main === require.cache[eval('__filename')]) {
-  run();
+	run();
 }
 
 module.exports = { run };
@@ -32844,74 +32844,74 @@ module.exports = { run };
 const core = __nccwpck_require__(7484);
 
 class Inputs {
-  constructor() {
-    this._milestoneTitle = core.getInput("milestone-title", { required: true });
-    this._websiteToken = core.getInput("website-token", { required: true });
-    this._apiDocUrl =
-      core.getInput("api-doc-url", { required: false }) ||
-      "https://docs.spring.io/{project}/site/docs/{version}/api/";
-    this._isAntora = core.getBooleanInput("is-antora", { required: false });
-    this._projectName = core.getInput("project-name", { required: false });
-    this._refDocUrl =
-      core.getInput("ref-doc-url", { required: false }) ||
-      "https://docs.spring.io/{project}/reference/{version}/index.html";
-    this._websiteRepository = core.getInput("website-repository", {
-      required: false,
-    });
-  }
+	constructor() {
+		this._milestoneTitle = core.getInput("milestone-title", { required: true });
+		this._websiteToken = core.getInput("website-token", { required: true });
+		this._apiDocUrl =
+			core.getInput("api-doc-url", { required: false }) ||
+			"https://docs.spring.io/{project}/site/docs/{version}/api/";
+		this._isAntora = core.getBooleanInput("is-antora", { required: false });
+		this._projectName = core.getInput("project-name", { required: false });
+		this._refDocUrl =
+			core.getInput("ref-doc-url", { required: false }) ||
+			"https://docs.spring.io/{project}/reference/{version}/index.html";
+		this._websiteRepository = core.getInput("website-repository", {
+			required: false,
+		});
+	}
 
-  get websiteToken() {
-    return this._websiteToken;
-  }
+	get websiteToken() {
+		return this._websiteToken;
+	}
 
-  get apiDocUrl() {
-    return this._apiDocUrl;
-  }
+	get apiDocUrl() {
+		return this._apiDocUrl;
+	}
 
-  get websiteRepository() {
-    if (this._websiteRepository) {
-      return this._websiteRepository;
-    }
-    if (this.projectName.includes("commercial")) {
-      return "spring-io/spring-website-commercial-content";
-    }
-    return "spring-io/spring-website-content";
-  }
+	get websiteRepository() {
+		if (this._websiteRepository) {
+			return this._websiteRepository;
+		}
+		if (this.projectName.includes("commercial")) {
+			return "spring-io/spring-website-commercial-content";
+		}
+		return "spring-io/spring-website-content";
+	}
 
-  get isAntora() {
-    return this._isAntora;
-  }
+	get isAntora() {
+		return this._isAntora;
+	}
 
-  get projectName() {
-    if (this._projectName) {
-      return this._projectName;
-    }
-    return process.env.GITHUB_REPOSITORY;
-  }
+	get projectName() {
+		if (this._projectName) {
+			return this._projectName;
+		}
+		return process.env.GITHUB_REPOSITORY;
+	}
 
-  get projectSlug() {
-    const name = this.projectName.substring(this.projectName.indexOf("/") + 1);
-    if (name.endsWith("-commercial")) {
-      return name.substring(0, name.length - "-commercial".length);
-    }
-    return name;
-  }
+	get projectSlug() {
+		const name = this.projectName.substring(this.projectName.indexOf("/") + 1);
+		if (name.endsWith("-commercial")) {
+			return name.substring(0, name.length - "-commercial".length);
+		}
+		return name;
+	}
 
-  get refDocUrl() {
-    return this._refDocUrl;
-  }
+	get refDocUrl() {
+		return this._refDocUrl;
+	}
 
-  get milestoneTitle() {
-    return this._milestoneTitle;
-  }
+	get milestoneTitle() {
+		return this._milestoneTitle;
+	}
 
-  get commercial() {
-    return this.projectName.includes("commercial");
-  }
+	get commercial() {
+		return this.projectName.includes("commercial");
+	}
 }
 
 module.exports = {
-  Inputs,
+	Inputs,
 };
 
 
@@ -32923,11 +32923,11 @@ module.exports = {
 const { getReleaseDate, mod } = __nccwpck_require__(1482);
 
 const releaseTrainMonths = {
-  M1: [0, 6],
-  M2: [1, 7],
-  M3: [2, 8],
-  RC1: [3, 9],
-  "": [4, 10],
+	M1: [0, 6],
+	M2: [1, 7],
+	M3: [2, 8],
+	RC1: [3, 9],
+	"": [4, 10],
 };
 
 /**
@@ -32936,225 +32936,223 @@ const releaseTrainMonths = {
  * @author Josh Cummings
  */
 class Version {
-  constructor(version, dueDate = new Date(), type = "oss") {
-    this._version = version;
-    this._dueDate = dueDate;
-    this._type = type;
-    const parts = version.split(/[.-]/);
-    this._major = parseInt(parts[0], 10);
-    this._minor = parseInt(parts[1], 10);
-    this._patch = parseInt(parts[2], 10);
-    this._classifier = parts.length === 3 ? "" : parts[3];
-  }
+	constructor(version, dueDate = new Date(), type = "oss") {
+		this._version = version;
+		this._dueDate = dueDate;
+		this._type = type;
+		const parts = version.split(/[.-]/);
+		this._major = parseInt(parts[0], 10);
+		this._minor = parseInt(parts[1], 10);
+		this._patch = parseInt(parts[2], 10);
+		this._classifier = parts.length === 3 ? "" : parts[3];
+	}
 
-  /**
-   * Construct a {@linkcode Version} instance based on a {@linkcode Milestones}
-   * value.
-   *
-   * @param milestone a milestone acquired from {@linkcode Milestones}
-   * @returns {Version}
-   */
-  static fromMilestone(milestone) {
-    return new Version(milestone.name, milestone.dueDate, milestone.type);
-  }
+	/**
+	 * Construct a {@linkcode Version} instance based on a {@linkcode Milestones}
+	 * value.
+	 *
+	 * @param milestone a milestone acquired from {@linkcode Milestones}
+	 * @returns {Version}
+	 */
+	static fromMilestone(milestone) {
+		return new Version(milestone.name, milestone.dueDate, milestone.type);
+	}
 
-  get version() {
-    return this._version;
-  }
+	get version() {
+		return this._version;
+	}
 
-  get major() {
-    return this._major;
-  }
+	get major() {
+		return this._major;
+	}
 
-  get minor() {
-    return this._minor;
-  }
+	get minor() {
+		return this._minor;
+	}
 
-  get patch() {
-    return this._patch;
-  }
+	get patch() {
+		return this._patch;
+	}
 
-  get classifier() {
-    return this._classifier;
-  }
+	get classifier() {
+		return this._classifier;
+	}
 
-  get dueDate() {
-    return this._dueDate;
-  }
+	get dueDate() {
+		return this._dueDate;
+	}
 
-  get type() {
-    return this._type;
-  }
+	get type() {
+		return this._type;
+	}
 
-  /**
-   * Whether this version is a snapshot version
-   * @returns {boolean}
-   */
-  get snapshot() {
-    return this._classifier === "SNAPSHOT";
-  }
+	/**
+	 * Whether this version is a snapshot version
+	 * @returns {boolean}
+	 */
+	get snapshot() {
+		return this._classifier === "SNAPSHOT";
+	}
 
-  /**
-   * Whether this version is a pre-release version, like RC1 or M2
-   * @returns {boolean}
-   */
-  get prerelease() {
-    return !!(this._classifier && this._classifier !== "SNAPSHOT");
-  }
+	/**
+	 * Whether this version is a pre-release version, like RC1 or M2
+	 * @returns {boolean}
+	 */
+	get prerelease() {
+		return !!(this._classifier && this._classifier !== "SNAPSHOT");
+	}
 
-  /**
-   * Whether this version is a GA version
-   * @returns {boolean}
-   */
-  get ga() {
-    return !this._classifier;
-  }
+	/**
+	 * Whether this version is a GA version
+	 * @returns {boolean}
+	 */
+	get ga() {
+		return !this._classifier;
+	}
 
-  /**
-   * Get the next milestone that follows after this version;
-   * returns {@code null} if given a snapshot version
-   *
-   * @param generation generation detail from {@linkcode Website}
-   * @returns {Version|null}
-   */
-  nextMilestone(generation) {
-    if (this.snapshot) {
-      return null;
-    }
-    if (this.ga) {
-      return _nextGa(this, generation);
-    }
-    return _nextMilestone(this, generation);
-  }
+	/**
+	 * Get the next milestone that follows after this version;
+	 * returns {@code null} if given a snapshot version
+	 *
+	 * @param generation generation detail from {@linkcode Website}
+	 * @returns {Version|null}
+	 */
+	nextMilestone(generation) {
+		if (this.snapshot) {
+			return null;
+		}
+		if (this.ga) {
+			return _nextGa(this, generation);
+		}
+		return _nextMilestone(this, generation);
+	}
 
-  /**
-   * Get the next snapshot that follows after this version.
-   *
-   * @returns {Version}
-   */
-  nextSnapshot() {
-    return _nextSnapshot(this);
-  }
+	/**
+	 * Get the next snapshot that follows after this version.
+	 *
+	 * @returns {Version}
+	 */
+	nextSnapshot() {
+		return _nextSnapshot(this);
+	}
 
-  /**
-   * Check if this version is the same major/minor generation as
-   * {@code other}
-   * @param other the version to compare to
-   * @returns {boolean}
-   */
-  isSameMajorMinor(other) {
-    return this.major === other.major && this.minor === other.minor;
-  }
+	/**
+	 * Check if this version is the same major/minor generation as
+	 * {@code other}
+	 * @param other the version to compare to
+	 * @returns {boolean}
+	 */
+	isSameMajorMinor(other) {
+		return this.major === other.major && this.minor === other.minor;
+	}
 }
 
 function _nextGa(v, generation) {
-  const next = _nextGaDate(v, generation);
-  if (!next) {
-    return null;
-  }
-  return new Version(_nextGaVersion(v), next.dueDate, next.type);
+	const next = _nextGaDate(v, generation);
+	if (!next) {
+		return null;
+	}
+	return new Version(_nextGaVersion(v), next.dueDate, next.type);
 }
 
 function _nextGaVersion(version) {
-  return `${version._major}.${version._minor}.${version._patch + 1}`;
+	return `${version._major}.${version._minor}.${version._patch + 1}`;
 }
 
 function _nextGaDate(version, generation) {
-  const currentMonth = version.dueDate.getMonth();
-  const currentYear = version.dueDate.getFullYear();
-  const oss = generation.oss;
-  const enterprise = generation.enterprise;
+	const currentMonth = version.dueDate.getMonth();
+	const currentYear = version.dueDate.getFullYear();
+	const oss = generation.oss;
+	const enterprise = generation.enterprise;
 
-  let releaseMonth =
-    currentMonth +
-    oss.frequency -
-    ((currentMonth - oss.offset) % oss.frequency);
-  let releaseYear = currentYear + Math.floor(releaseMonth / 12);
-  releaseMonth = mod(releaseMonth, 12);
+	let releaseMonth =
+		currentMonth + oss.frequency - ((currentMonth - oss.offset) % oss.frequency);
+	let releaseYear = currentYear + Math.floor(releaseMonth / 12);
+	releaseMonth = mod(releaseMonth, 12);
 
-  if (releaseMonth <= oss.end.month && releaseYear <= oss.end.year) {
-    const dueDate = getReleaseDate(
-      releaseMonth,
-      releaseYear,
-      generation.dayOfWeek,
-      generation.weekOfMonth,
-    );
-    return { dueDate, type: "oss" };
-  }
+	if (releaseMonth <= oss.end.month && releaseYear <= oss.end.year) {
+		const dueDate = getReleaseDate(
+			releaseMonth,
+			releaseYear,
+			generation.dayOfWeek,
+			generation.weekOfMonth,
+		);
+		return { dueDate, type: "oss" };
+	}
 
-  releaseMonth =
-    currentMonth +
-    enterprise.frequency -
-    ((currentMonth - enterprise.offset) % enterprise.frequency);
-  releaseYear = currentYear + Math.floor(releaseMonth / 12);
-  releaseMonth = mod(releaseMonth, 12);
+	releaseMonth =
+		currentMonth +
+		enterprise.frequency -
+		((currentMonth - enterprise.offset) % enterprise.frequency);
+	releaseYear = currentYear + Math.floor(releaseMonth / 12);
+	releaseMonth = mod(releaseMonth, 12);
 
-  if (
-    releaseMonth <= enterprise.end.month &&
-    releaseYear <= enterprise.end.year
-  ) {
-    const dueDate = getReleaseDate(
-      releaseMonth,
-      releaseYear,
-      generation.dayOfWeek,
-      generation.weekOfMonth,
-    );
-    return { dueDate, type: "enterprise" };
-  }
+	if (
+		releaseMonth <= enterprise.end.month &&
+		releaseYear <= enterprise.end.year
+	) {
+		const dueDate = getReleaseDate(
+			releaseMonth,
+			releaseYear,
+			generation.dayOfWeek,
+			generation.weekOfMonth,
+		);
+		return { dueDate, type: "enterprise" };
+	}
 
-  return null;
+	return null;
 }
 
 function _nextMilestone(v, generation) {
-  const nextVersion = new Version(_nextMilestoneVersion(v), v.dueDate, v.type);
-  const nextDate = _nextMilestoneDate(nextVersion, generation);
-  return new Version(nextVersion.version, nextDate, v.type);
+	const nextVersion = new Version(_nextMilestoneVersion(v), v.dueDate, v.type);
+	const nextDate = _nextMilestoneDate(nextVersion, generation);
+	return new Version(nextVersion.version, nextDate, v.type);
 }
 
 function _nextMilestoneVersion(version) {
-  if (version._classifier === "M1") {
-    return `${version._major}.${version._minor}.${version._patch}-M2`;
-  }
-  if (version._classifier === "M2") {
-    return `${version._major}.${version._minor}.${version._patch}-M3`;
-  }
-  if (version._classifier.startsWith("M")) {
-    return `${version._major}.${version._minor}.${version._patch}-RC1`;
-  }
-  return `${version._major}.${version._minor}.${version._patch}`;
+	if (version._classifier === "M1") {
+		return `${version._major}.${version._minor}.${version._patch}-M2`;
+	}
+	if (version._classifier === "M2") {
+		return `${version._major}.${version._minor}.${version._patch}-M3`;
+	}
+	if (version._classifier.startsWith("M")) {
+		return `${version._major}.${version._minor}.${version._patch}-RC1`;
+	}
+	return `${version._major}.${version._minor}.${version._patch}`;
 }
 
 function _nextMilestoneDate(version, generation) {
-  const currentMonth = version.dueDate.getMonth();
-  const candidateMonths = releaseTrainMonths[version._classifier];
-  const index =
-    mod(candidateMonths[0] - currentMonth, 12) <
-    mod(candidateMonths[1] - currentMonth, 12)
-      ? 0
-      : 1;
-  const month = candidateMonths[index];
-  const year = version.dueDate.getFullYear() + (month < currentMonth);
-  return getReleaseDate(
-    month,
-    year,
-    generation.dayOfWeek,
-    generation.weekOfMonth,
-  );
+	const currentMonth = version.dueDate.getMonth();
+	const candidateMonths = releaseTrainMonths[version._classifier];
+	const index =
+		mod(candidateMonths[0] - currentMonth, 12) <
+		mod(candidateMonths[1] - currentMonth, 12)
+			? 0
+			: 1;
+	const month = candidateMonths[index];
+	const year = version.dueDate.getFullYear() + (month < currentMonth);
+	return getReleaseDate(
+		month,
+		year,
+		generation.dayOfWeek,
+		generation.weekOfMonth,
+	);
 }
 
 function _nextSnapshot(version) {
-  if (version.ga) {
-    return new Version(
-      `${version.major}.${version.minor}.${version.patch + 1}-SNAPSHOT`,
-    );
-  }
-  return new Version(
-    `${version.major}.${version.minor}.${version.patch}-SNAPSHOT`,
-  );
+	if (version.ga) {
+		return new Version(
+			`${version.major}.${version.minor}.${version.patch + 1}-SNAPSHOT`,
+		);
+	}
+	return new Version(
+		`${version.major}.${version.minor}.${version.patch}-SNAPSHOT`,
+	);
 }
 
 module.exports = {
-  Version,
+	Version,
 };
 
 

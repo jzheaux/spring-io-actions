@@ -30257,31 +30257,31 @@ const axios = __nccwpck_require__(7269);
  * @author Josh Cummings
  */
 class Announce {
-  constructor(announcementUrl, projectName) {
-    this.announcementUrl = announcementUrl;
-    this.projectName = projectName;
-  }
+	constructor(announcementUrl, projectName) {
+		this.announcementUrl = announcementUrl;
+		this.projectName = projectName;
+	}
 
-  /**
-   * Announce a completed release
-   * @param milestoneTitle the milestone released, like {@code 1.2.3}
-   * @returns {Promise<void>}
-   */
-  async announceRelease(milestoneTitle) {
-    const text = `${this.projectName}-announcing \`${milestoneTitle}\` is available now`;
-    await axios.post(this.announcementUrl, { text });
-  }
+	/**
+	 * Announce a completed release
+	 * @param milestoneTitle the milestone released, like {@code 1.2.3}
+	 * @returns {Promise<void>}
+	 */
+	async announceRelease(milestoneTitle) {
+		const text = `${this.projectName}-announcing \`${milestoneTitle}\` is available now`;
+		await axios.post(this.announcementUrl, { text });
+	}
 
-  /**
-   * Announce a planned release
-   * @param milestoneTitle the milestone planned, like {@code 1.2.4}
-   * @param milestoneDate the date the milestone is planned for, like {@code 2026-01-02}
-   * @returns {Promise<void>}
-   */
-  async planRelease(milestoneTitle, milestoneDate) {
-    const text = `${this.projectName}-planning \`${milestoneTitle}\` on ${milestoneDate}`;
-    await axios.post(this.announcementUrl, { text });
-  }
+	/**
+	 * Announce a planned release
+	 * @param milestoneTitle the milestone planned, like {@code 1.2.4}
+	 * @param milestoneDate the date the milestone is planned for, like {@code 2026-01-02}
+	 * @returns {Promise<void>}
+	 */
+	async planRelease(milestoneTitle, milestoneDate) {
+		const text = `${this.projectName}-planning \`${milestoneTitle}\` on ${milestoneDate}`;
+		await axios.post(this.announcementUrl, { text });
+	}
 }
 
 module.exports = { Announce };
@@ -30297,17 +30297,17 @@ const { Inputs } = __nccwpck_require__(7514);
 const { Announce } = __nccwpck_require__(3786);
 
 async function run() {
-  const inputs = new Inputs();
-  const announce = new Announce(inputs.gchatWebhookUrl, inputs.projectName);
-  try {
-    await announce.planRelease(inputs.milestoneTitle, inputs.milestoneDate);
-  } catch (error) {
-    core.setFailed(error.message);
-  }
+	const inputs = new Inputs();
+	const announce = new Announce(inputs.gchatWebhookUrl, inputs.projectName);
+	try {
+		await announce.planRelease(inputs.milestoneTitle, inputs.milestoneDate);
+	} catch (error) {
+		core.setFailed(error.message);
+	}
 }
 
 if (require.main === require.cache[eval('__filename')]) {
-  run();
+	run();
 }
 
 module.exports = { run };
@@ -30321,32 +30321,32 @@ module.exports = { run };
 const core = __nccwpck_require__(7484);
 
 class Inputs {
-  constructor() {
-    this._gchatWebhookUrl = core.getInput("gchat-webhook-url");
-    this._milestoneTitle = core.getInput("milestone-title");
-    this._milestoneDate = core.getInput("milestone-date");
-    this._projectName = core.getInput("project-name", { required: false });
-  }
+	constructor() {
+		this._gchatWebhookUrl = core.getInput("gchat-webhook-url");
+		this._milestoneTitle = core.getInput("milestone-title");
+		this._milestoneDate = core.getInput("milestone-date");
+		this._projectName = core.getInput("project-name", { required: false });
+	}
 
-  get gchatWebhookUrl() {
-    return this._gchatWebhookUrl;
-  }
+	get gchatWebhookUrl() {
+		return this._gchatWebhookUrl;
+	}
 
-  get milestoneTitle() {
-    return this._milestoneTitle;
-  }
+	get milestoneTitle() {
+		return this._milestoneTitle;
+	}
 
-  get milestoneDate() {
-    return this._milestoneDate;
-  }
+	get milestoneDate() {
+		return this._milestoneDate;
+	}
 
-  get projectName() {
-    return this._projectName || process.env.GITHUB_REPOSITORY.split("/")[1];
-  }
+	get projectName() {
+		return this._projectName || process.env.GITHUB_REPOSITORY.split("/")[1];
+	}
 }
 
 module.exports = {
-  Inputs,
+	Inputs,
 };
 
 

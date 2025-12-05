@@ -3,17 +3,17 @@ const { Inputs } = require("./inputs");
 const { Announce } = require("../announce");
 
 async function run() {
-  const inputs = new Inputs();
-  const announce = new Announce(inputs.gchatWebhookUrl, inputs.projectName);
-  try {
-    await announce.announceRelease(inputs.milestoneTitle);
-  } catch (error) {
-    core.setFailed(error.message);
-  }
+	const inputs = new Inputs();
+	const announce = new Announce(inputs.gchatWebhookUrl, inputs.projectName);
+	try {
+		await announce.announceRelease(inputs.milestoneTitle);
+	} catch (error) {
+		core.setFailed(error.message);
+	}
 }
 
 if (require.main === module) {
-  run();
+	run();
 }
 
 module.exports = { run };

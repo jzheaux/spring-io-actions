@@ -7,64 +7,64 @@ const { Version } = require("../versions");
 
 const inputs = new Inputs();
 const milestones = new Milestones(
-  inputs.milestoneToken,
-  inputs.milestoneRepository,
+	inputs.milestoneToken,
+	inputs.milestoneRepository,
 );
 const projects = new Website(inputs);
 
 async function run() {
-  const version = await _getVersion();
-  if (!version) {
-    core.setFailed(
-      `Could not find milestone ${inputs.milestoneTitle} or it has no due date.`,
-    );
-    return;
-  }
-  const generation = await _getGeneration(version);
-  if (!generation) {
-    core.setFailed(
-      `Could not find generation for version ${inputs.milestoneTitle}.`,
-    );
-    return;
-  }
-  const release = version.nextMilestone(generation);
-  if (!release) {
-    core.setFailed(
-      `Could not calculate next release for version ${inputs.milestoneTitle}.`,
-    );
-    return;
-  }
-  const nextVersion = release.version;
-  const nextVersionType = release.type;
-  const nextVersionDate = release.dueDate.toISOString().substring(0, 10);
-  console.log(
-    `Next version is ${nextVersion} (${nextVersionType}) on ${nextVersionDate}`,
-  );
-  core.setOutput("next-version", nextVersion);
-  core.setOutput("next-version-date", nextVersionDate);
-  core.setOutput("next-version-type", nextVersionType);
+	const version = await _getVersion();
+	if (!version) {
+		core.setFailed(
+			`Could not find milestone ${inputs.milestoneTitle} or it has no due date.`,
+		);
+		return;
+	}
+	const generation = await _getGeneration(version);
+	if (!generation) {
+		core.setFailed(
+			`Could not find generation for version ${inputs.milestoneTitle}.`,
+		);
+		return;
+	}
+	const release = version.nextMilestone(generation);
+	if (!release) {
+		core.setFailed(
+			`Could not calculate next release for version ${inputs.milestoneTitle}.`,
+		);
+		return;
+	}
+	const nextVersion = release.version;
+	const nextVersionType = release.type;
+	const nextVersionDate = release.dueDate.toISOString().substring(0, 10);
+	console.log(
+		`Next version is ${nextVersion} (${nextVersionType}) on ${nextVersionDate}`,
+	);
+	core.setOutput("next-version", nextVersion);
+	core.setOutput("next-version-date", nextVersionDate);
+	core.setOutput("next-version-type", nextVersionType);
 }
 
 async function _getVersion() {
-  const milestone = await milestones.findMilestoneByName(inputs.milestoneTitle);
-  if (!milestone || !milestone.dueDate) {
-    return null;
-  }
-  return Version.fromMilestone(milestone);
+	const milestone = await milestones.findMilestoneByName(inputs.milestoneTitle);
+	if (!milestone || !milestone.dueDate) {
+		return null;
+	}
+	return Version.fromMilestone(milestone);
 }
 
 async function _getGeneration(version) {
-  try {
-    return await projects.getGenerationByVersion(version);
-  } catch (error) {
-    core.setFailed(error);
-  }
+	try {
+		return await projects.getGenerationByVersion(version);
+	} catch (error) {
+		core.setFailed(error);
+	}
 }
 
 if (require.main === module) {
-  run();
+	run();
 }
 
 module.exports = {
-  run,
+	run,
 };
