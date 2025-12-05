@@ -5,11 +5,11 @@ const { Milestones } = require("../milestones");
 async function run() {
 	const inputs = new Inputs();
 	const milestones = new Milestones(
-		inputs.milestoneToken,
-		inputs.milestoneRepository,
+		inputs.token,
+		inputs.repository,
 	);
 	try {
-		await milestones.closeMilestone(inputs.milestoneTitle);
+		await milestones.closeMilestone(inputs.version);
 	} catch (error) {
 		core.setFailed(error.message);
 	}

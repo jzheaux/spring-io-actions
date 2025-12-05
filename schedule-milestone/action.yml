@@ -3,20 +3,20 @@ description: "An action that schedules a milestone, updating it if it already ex
 author: "jzheaux"
 
 inputs:
-  milestone-date:
-    description: "The milestone date"
+  version-date:
+    description: "The version date"
     required: true
-  milestone-title:
-    description: "The milestone to close"
+  version:
+    description: "The version to schedule"
     required: true
 
-  milestone-description:
-    description: "The milestone description"
+  description:
+    description: "The version description"
     required: false
-  milestone-repository:
+  repository:
     description: "The repository to publish the milestone to; uses the current repository by default"
     required: false
-  milestone-token:
+  token:
     description: "The GitHub token for the repository; uses the current repository's token by default"
     required: false
 

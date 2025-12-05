@@ -6,7 +6,7 @@ const { Version } = require("../versions");
 
 async function run() {
 	const inputs = new Inputs();
-	if (inputs.milestoneTitle.endsWith("-SNAPSHOT")) {
+	if (inputs.version.endsWith("-SNAPSHOT")) {
 		core.setFailed(
 			"Please specify a non-SNAPSHOT release version to publish; it's accompanying SNAPSHOT version will also be published",
 		);
@@ -33,7 +33,7 @@ async function run() {
 	}
 
 	const learnPage = new LearnPage(file ? file.content : "[]");
-	const version = new Version(inputs.milestoneTitle);
+	const version = new Version(inputs.version);
 	const refDocUrl = inputs.refDocUrl.replace(
 		/{project}|{slug}/g,
 		inputs.projectSlug,
@@ -63,7 +63,7 @@ async function run() {
 	}
 
 	const updatedContent = Buffer.from(learnPage.toString()).toString("base64");
-	const message = `Update #learn Page for ${inputs.projectName} ${inputs.milestoneTitle}`;
+	const message = `Update #learn Page for ${inputs.projectName} ${inputs.version}`;
 	await octokit.repos.createOrUpdateFileContents({
 		owner,
 		repo,

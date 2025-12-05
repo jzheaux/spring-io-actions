@@ -3,7 +3,7 @@ description: "Update #learn Page on Spring OSS and Commercial Websites"
 author: "jzheaux"
 
 inputs:
-  milestone-title:
+  version:
     description: "The current version"
     required: true
   website-token:

@@ -1,10 +1,10 @@
 const core = require('@actions/core');
 const { Inputs } = require('../src/plan-on-gchat/inputs');
-const { Announce } = require('../src/announce');
+const { Announce } = require('../src/gchat');
 const { run } = require('../src/plan-on-gchat');
 
 jest.mock('@actions/core');
-jest.mock('../src/announce');
+jest.mock('../src/gchat');
 jest.mock('../src/plan-on-gchat/inputs');
 
 describe('plan-on-gchat', () => {
@@ -15,8 +15,8 @@ describe('plan-on-gchat', () => {
 	it('plans a release', async () => {
 		Inputs.mockImplementation(() => ({
             gchatWebhookUrl: 'https://example.com',
-			milestoneTitle: 'title',
-			milestoneDate: '2025-12-25',
+			version: 'title',
+			versionDate: '2025-12-25',
 			get projectName() {
 				return process.env.GITHUB_REPOSITORY.split('/')[1];
 			}
@@ -29,8 +29,8 @@ describe('plan-on-gchat', () => {
 	it('uses project-name', async () => {
 		inputs = {
             gchatWebhookUrl: 'https://example.com',
-			milestoneTitle: 'title',
-			milestoneDate: '2025-12-25',
+			version: 'title',
+			versionDate: '2025-12-25',
 			projectName: 'project'
         };
         Inputs.mockImplementation(() => inputs);

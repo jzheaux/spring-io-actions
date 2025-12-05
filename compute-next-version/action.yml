@@ -3,18 +3,18 @@ description: "An action that computes the next milestone release name and date"
 author: "jzheaux"
 
 inputs:
-  milestone-title:
+  version:
     description: "The current project version"
     required: true
-  milestone-token:
-    description: "The token needed to query project milestone information"
+  token:
+    description: "The token to query repository information"
     required: true
   website-token:
-    description: "The token needed to query spring-website-content for generation information"
+    description: "The token to query website information"
     required: true
 
-  milestone-repository:
-    description: "The repository to query project milestone information"
+  repository:
+    description: "The repository to query for information"
     required: false
   project-slug:
     description: "The website content slug"
@@ -24,11 +24,11 @@ inputs:
     required: false
 
 outputs:
-  next-version:
+  version:
     description: "The next project version"
-  next-version-date:
+  version-date:
     description: "The scheduled date for the next project version"
-  next-version-type:
+  version-type:
     description: "The type of the next project version (for example, 'oss', 'enterprise')"
 
 runs:

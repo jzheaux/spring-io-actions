@@ -6,8 +6,8 @@ inputs:
   gchat-webhook-url:
     description: "The GChat Webhook to POST the announcement message to"
     required: true
-  milestone-title:
-    description: "The title of the milestone just released"
+  version:
+    description: "The version that was just released"
     required: true
 
   project-name:
