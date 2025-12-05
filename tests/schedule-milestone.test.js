@@ -10,9 +10,9 @@ jest.mock('../src/schedule-milestone/inputs');
 describe('schedule-milestone', () => {
 	it('schedules a milestone', async () => {
         Inputs.mockImplementation(() => ({
-			milestoneTitle: 'title',
-            milestoneDate: '2025-12-25',
-			milestoneDescription: 'description'
+			version: 'title',
+            versionDate: '2025-12-25',
+			description: 'description'
 		}));
 		await run();
 		expect(Milestones.prototype.scheduleMilestone).toHaveBeenCalledWith('title', '2025-12-25', 'description');

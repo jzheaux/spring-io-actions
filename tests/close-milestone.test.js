@@ -16,7 +16,7 @@ describe('close-milestone', () => {
 
 	it('closes a milestone', async () => {
         Inputs.mockImplementation(() => ({
-            milestoneTitle: 'title'
+            version: 'title'
         }));
         await run();
 		expect(Milestones.prototype.closeMilestone).toHaveBeenCalledWith('title');

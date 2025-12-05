@@ -5,14 +5,14 @@ const { Milestones } = require("../milestones");
 async function run() {
 	const inputs = new Inputs();
 	const milestones = new Milestones(
-		inputs.milestoneToken,
-		inputs.milestoneRepository,
+		inputs.token,
+		inputs.repository,
 	);
 	try {
 		await milestones.scheduleMilestone(
-			inputs.milestoneTitle,
-			inputs.milestoneDate,
-			inputs.milestoneDescription,
+			inputs.version,
+			inputs.versionDate,
+			inputs.description,
 		);
 	} catch (error) {
 		core.setFailed(error.message);

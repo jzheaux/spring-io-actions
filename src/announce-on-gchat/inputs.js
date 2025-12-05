@@ -3,7 +3,7 @@ const core = require("@actions/core");
 class Inputs {
 	constructor() {
 		this._gchatWebhookUrl = core.getInput("gchat-webhook-url");
-		this._milestoneTitle = core.getInput("milestone-title");
+		this._version = core.getInput("version");
 		this._projectName = core.getInput("project-name", { required: false });
 	}
 
@@ -11,8 +11,8 @@ class Inputs {
 		return this._gchatWebhookUrl;
 	}
 
-	get milestoneTitle() {
-		return this._milestoneTitle;
+	get version() {
+		return this._version;
 	}
 
 	get projectName() {

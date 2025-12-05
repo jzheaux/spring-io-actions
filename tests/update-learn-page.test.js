@@ -15,7 +15,7 @@ describe('Update Learn Page Action', () => {
     beforeEach(() => {
         inputs = {
             websiteToken: 'token',
-            milestoneTitle: '1.2.3',
+            version: '1.2.3',
             projectName: 'spring-projects/spring-boot',
             websiteRepository: 'spring-io/spring-website-content',
             projectSlug: 'spring-boot',
@@ -38,7 +38,7 @@ describe('Update Learn Page Action', () => {
     });
 
     it('should fail if the version is a SNAPSHOT', async () => {
-        inputs.milestoneTitle = '1.2.3-SNAPSHOT';
+        inputs.version = '1.2.3-SNAPSHOT';
         await run();
         expect(core.setFailed).toHaveBeenCalledWith("Please specify a non-SNAPSHOT release version to publish; it's accompanying SNAPSHOT version will also be published");
     });
@@ -97,7 +97,7 @@ describe('Update Learn Page Action Commercial', () => {
         process.env.GITHUB_REPOSITORY = "owner/repo";
         inputs = {
             websiteToken: 'token',
-            milestoneTitle: '1.2.3',
+            version: '1.2.3',
             projectName: 'spring-projects/spring-boot-commercial',
             websiteRepository: 'spring-io/spring-website-content-commercial',
             projectSlug: 'spring-boot',
@@ -121,7 +121,7 @@ describe('Update Learn Page Action Commercial', () => {
     });
 
     it('should fail if the version is a SNAPSHOT', async () => {
-        inputs.milestoneTitle = '1.2.3-SNAPSHOT';
+        inputs.version = '1.2.3-SNAPSHOT';
         await run();
         expect(core.setFailed).toHaveBeenCalledWith("Please specify a non-SNAPSHOT release version to publish; it's accompanying SNAPSHOT version will also be published");
     });

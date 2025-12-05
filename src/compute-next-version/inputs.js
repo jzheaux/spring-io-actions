@@ -4,13 +4,13 @@ class Inputs {
 	constructor() {
 		const repository = process.env.GITHUB_REPOSITORY.split("/")[1];
 		const commercial = repository.endsWith("-commercial");
-		this._milestoneTitle = core.getInput("milestone-title", { required: true });
-		this._milestoneToken = core.getInput("milestone-token", {
+		this._version = core.getInput("version", { required: true });
+		this._token = core.getInput("token", {
 			required: true,
 		});
 		this._websiteToken = core.getInput("website-token", { required: true });
-		this._milestoneRepository =
-			core.getInput("milestone-repository") || process.env.GITHUB_REPOSITORY;
+		this._repository =
+			core.getInput("repository") || process.env.GITHUB_REPOSITORY;
 		let websiteRepository = core.getInput("website-repository");
 		if (!websiteRepository) {
 			websiteRepository = commercial
@@ -25,20 +25,20 @@ class Inputs {
 		this._websiteRepository = websiteRepository;
 	}
 
-	get milestoneTitle() {
-		return this._milestoneTitle;
+	get version() {
+		return this._version;
 	}
 
-	get milestoneToken() {
-		return this._milestoneToken;
+	get token() {
+		return this._token;
 	}
 
 	get websiteToken() {
 		return this._websiteToken;
 	}
 
-	get milestoneRepository() {
-		return this._milestoneRepository;
+	get repository() {
+		return this._repository;
 	}
 
 	get projectSlug() {

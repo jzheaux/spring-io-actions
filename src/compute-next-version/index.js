@@ -7,8 +7,8 @@ const { Version } = require("../versions");
 
 const inputs = new Inputs();
 const milestones = new Milestones(
-	inputs.milestoneToken,
-	inputs.milestoneRepository,
+	inputs.token,
+	inputs.repository,
 );
 const projects = new Website(inputs);
 
@@ -16,21 +16,21 @@ async function run() {
 	const version = await _getVersion();
 	if (!version) {
 		core.setFailed(
-			`Could not find milestone ${inputs.milestoneTitle} or it has no due date.`,
+			`Could not find milestone ${inputs.version} or it has no due date.`,
 		);
 		return;
 	}
 	const generation = await _getGeneration(version);
 	if (!generation) {
 		core.setFailed(
-			`Could not find generation for version ${inputs.milestoneTitle}.`,
+			`Could not find generation for version ${inputs.version}.`,
 		);
 		return;
 	}
 	const release = version.nextMilestone(generation);
 	if (!release) {
 		core.setFailed(
-			`Could not calculate next release for version ${inputs.milestoneTitle}.`,
+			`Could not calculate next release for version ${inputs.version}.`,
 		);
 		return;
 	}
@@ -40,13 +40,13 @@ async function run() {
 	console.log(
 		`Next version is ${nextVersion} (${nextVersionType}) on ${nextVersionDate}`,
 	);
-	core.setOutput("next-version", nextVersion);
-	core.setOutput("next-version-date", nextVersionDate);
-	core.setOutput("next-version-type", nextVersionType);
+	core.setOutput("version", nextVersion);
+	core.setOutput("version-date", nextVersionDate);
+	core.setOutput("version-type", nextVersionType);
 }
 
 async function _getVersion() {
-	const milestone = await milestones.findMilestoneByName(inputs.milestoneTitle);
+	const milestone = await milestones.findMilestoneByName(inputs.version);
 	if (!milestone || !milestone.dueDate) {
 		return null;
 	}

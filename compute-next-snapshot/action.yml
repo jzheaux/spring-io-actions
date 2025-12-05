@@ -3,12 +3,12 @@ description: "An action that determines the next snapshot version for the projec
 author: "jzheaux"
 
 inputs:
-  milestone-title:
-    description: "The title of the current milestone"
+  version:
+    description: "The current version"
     required: true
 
 outputs:
-  snapshot-version:
+  version:
     description: "The next snapshot version for the project"
     value: ${{ steps.compute-version.outputs.version }}
 

@@ -6,9 +6,9 @@ const { Version } = require("../versions");
 const inputs = new Inputs();
 
 async function run() {
-	const version = new Version(inputs.milestoneTitle);
+	const version = new Version(inputs.version);
 	const next = version.nextSnapshot();
-	core.setOutput("snapshot-version", next.version);
+	core.setOutput("version", next.version);
 }
 
 if (require.main === module) {

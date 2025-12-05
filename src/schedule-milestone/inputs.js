@@ -2,33 +2,33 @@ const core = require("@actions/core");
 
 class Inputs {
 	constructor() {
-		this._milestoneDate = core.getInput("milestone-date");
-		this._milestoneTitle = core.getInput("milestone-title");
-		this._milestoneDescription = core.getInput("milestone-description");
-		this._milestoneRepsitory =
-			core.getInput("milestone-repository") || process.env.GITHUB_REPOSITORY;
-		this._milestoneToken =
-			core.getInput("milestone-token") || process.env.GITHUB_TOKEN;
+		this._versionDate = core.getInput("version-date");
+		this._version = core.getInput("version");
+		this._description = core.getInput("description");
+		this._repository =
+			core.getInput("repository") || process.env.GITHUB_REPOSITORY;
+		this._token =
+			core.getInput("token") || process.env.GITHUB_TOKEN;
 	}
 
-	get milestoneDate() {
-		return this._milestoneDate;
+	get versionDate() {
+		return this._versionDate;
 	}
 
-	get milestoneTitle() {
-		return this._milestoneTitle;
+	get version() {
+		return this._version;
 	}
 
-	get milestoneDescription() {
-		return this._milestoneDescription;
+	get description() {
+		return this._description;
 	}
 
-	get milestoneRepository() {
-		return this._milestoneRepsitory;
+	get repository() {
+		return this._repository;
 	}
 
-	get milestoneToken() {
-		return this._milestoneToken;
+	get token() {
+		return this._token;
 	}
 }
 

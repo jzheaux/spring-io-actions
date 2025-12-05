@@ -2,7 +2,7 @@ const core = require("@actions/core");
 
 class Inputs {
 	constructor() {
-		this._milestoneTitle = core.getInput("milestone-title", { required: true });
+		this._version = core.getInput("version", { required: true });
 		this._websiteToken = core.getInput("website-token", { required: true });
 		this._apiDocUrl =
 			core.getInput("api-doc-url", { required: false }) ||
@@ -58,8 +58,8 @@ class Inputs {
 		return this._refDocUrl;
 	}
 
-	get milestoneTitle() {
-		return this._milestoneTitle;
+	get version() {
+		return this._version;
 	}
 
 	get commercial() {
