@@ -32637,14 +32637,12 @@ const milestones = new Milestones(
 );
 
 async function run() {
-	if (!inputs.version.endsWith("-SNAPSHOT")) {
-		core.setFailed(
-			"Please specify a SNAPSHOT release version; it's best-matching scheduled release will be returned",
-		);
+	const version = new Version(inputs.version);
+	if (!version.snapshot) {
+		core.setOutput("release-version", "");
 		return;
 	}
-	const version = new Version(inputs.version);
-	const milestone = milestones.findEarliestOpenMilestoneInGeneration({
+	const milestone = milestones.findOpenMilestoneDueTodayForGeneration({
 		major: version.major,
 		minor: version.minor,
 	});
@@ -32674,7 +32672,7 @@ const core = __nccwpck_require__(7484);
 
 class Inputs {
 	constructor() {
-		this._version = core.getInput("version", { required: true });
+		this._version = core.getInput("snapshot-version", { required: true });
 		this._milestoneRepository =
 			core.getInput("milestone-repository") || process.env.GITHUB_REPOSITORY;
 		this._milestoneToken =
@@ -32796,7 +32794,7 @@ class Milestones {
 		};
 	}
 
-	async findEarliestOpenMilestoneInGeneration(generation) {
+	async findOpenMilestoneDueTodayForGeneration(generation) {
 		const { data: milestones } = await this.gh.rest.issues.listMilestones({
 			owner: this.owner,
 			repo: this.repo,
@@ -32812,6 +32810,7 @@ class Milestones {
 					generation.minor === parseInt(minor)
 				);
 			})
+			.filter((m) => _isToday(new Date(m.due_on)))
 			.sort((a, b) => compareVersions(a.title, b.title));
 		if (!filtered || !filtered.length) {
 			return null;
@@ -32871,6 +32870,15 @@ class Milestones {
 			});
 		}
 	}
+}
+
+function _isToday(dueDate) {
+	const today = new Date();
+	return (
+		dueDate.getDate() === today.getDate() &&
+		dueDate.getMonth() === today.getMonth() &&
+		dueDate.getFullYear() === today.getFullYear()
+	);
 }
 
 module.exports = {
