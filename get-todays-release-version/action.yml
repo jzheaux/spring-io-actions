@@ -1,9 +1,9 @@
-name: "compute-release-version"
+name: "get-todays-release-version"
 description: "An action that matches the earliest open milestone to the project's current snapshot"
 author: "jzheaux"
 
 inputs:
-  milestone-title:
+  version:
     description: "The current project version"
     required: true
   milestone-token:
@@ -20,4 +20,4 @@ outputs:
 
 runs:
   using: "node20"
-  main: '../dist/compute-release-version/main/index.js'
+  main: '../dist/get-todays-release-version/main/index.js'

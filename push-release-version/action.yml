@@ -1,5 +1,5 @@
-name: "push-next-development-version"
-description: "Push the next development version"
+name: "push-release-version"
+description: "Push release version"
 author: "jzheaux"
 
 inputs:
@@ -10,17 +10,10 @@ inputs:
 runs:
   using: "composite"
   steps:
-  - name: Compute Snapshot
-    id: compute-snapshot
-    uses: jzheaux/spring-io-actions/compute-version@main
-  - name: Compute Release Version
-    uses: jzheaux/spring-io-actions/compute-release-version@main
-    with:
-      version: ${{ steps.compute-snapshot.outputs.version }}
-  - name: Push Next Development Version
+  - name: Set Version on Project
     shell: bash
     env:
-      VERSION: ${{ steps.compute-release.version.outputs.release-version }}
+      VERSION: ${{ inputs.version }}
     run: |
       if test -f pom.xml
       then
@@ -28,6 +21,11 @@ runs:
       else
         sed -i "s/version=.*/version=$VERSION/" gradle.properties
       fi
+  - name: Commit Version
+    shell: bash
+    env:
+      VERSION: ${{ inputs.version }}
+    run: |
       git config user.name 'github-actions[bot]'
       git config user.email 'github-actions[bot]@users.noreply.github.com'
       git commit -am "Release $VERSION"
