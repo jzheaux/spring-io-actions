@@ -2,7 +2,7 @@ const core = require("@actions/core");
 
 class Inputs {
 	constructor() {
-		this._version = core.getInput("version", { required: true });
+		this._version = core.getInput("snapshot-version", { required: true });
 		this._milestoneRepository =
 			core.getInput("milestone-repository") || process.env.GITHUB_REPOSITORY;
 		this._milestoneToken =

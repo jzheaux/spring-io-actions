@@ -11,14 +11,12 @@ const milestones = new Milestones(
 );
 
 async function run() {
-	if (!inputs.version.endsWith("-SNAPSHOT")) {
-		core.setFailed(
-			"Please specify a SNAPSHOT release version; it's best-matching scheduled release will be returned",
-		);
+	const version = new Version(inputs.version);
+	if (!version.snapshot) {
+		core.setOutput("release-version", "");
 		return;
 	}
-	const version = new Version(inputs.version);
-	const milestone = milestones.findEarliestOpenMilestoneInGeneration({
+	const milestone = milestones.findOpenMilestoneDueTodayForGeneration({
 		major: version.major,
 		minor: version.minor,
 	});

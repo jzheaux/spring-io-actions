@@ -49,7 +49,7 @@ class Milestones {
 		};
 	}
 
-	async findEarliestOpenMilestoneInGeneration(generation) {
+	async findOpenMilestoneDueTodayForGeneration(generation) {
 		const { data: milestones } = await this.gh.rest.issues.listMilestones({
 			owner: this.owner,
 			repo: this.repo,
@@ -65,6 +65,7 @@ class Milestones {
 					generation.minor === parseInt(minor)
 				);
 			})
+			.filter((m) => _isToday(new Date(m.due_on)))
 			.sort((a, b) => compareVersions(a.title, b.title));
 		if (!filtered || !filtered.length) {
 			return null;
@@ -124,6 +125,15 @@ class Milestones {
 			});
 		}
 	}
+}
+
+function _isToday(dueDate) {
+	const today = new Date();
+	return (
+		dueDate.getDate() === today.getDate() &&
+		dueDate.getMonth() === today.getMonth() &&
+		dueDate.getFullYear() === today.getFullYear()
+	);
 }
 
 module.exports = {

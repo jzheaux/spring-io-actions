@@ -2,26 +2,39 @@ name: test-begin-release.yml
 on:
   workflow_dispatch:
 
+env:
+  WIDGETS_REPOSITORY: 'jzheaux/spring-widgets'
+  WEBSITE_REPOSITORY: 'jzheaux/jzheaux-website-content'
+  GH_TOKEN: ${{ secrets.WIDGETS_TOKEN }}
+
 jobs:
   planner:
+    name: "Is there a release that is ready today?"
     runs-on: ubuntu-latest
     outputs:
       release-version: ${{ steps.release-version.outputs.release-version }}
       should-release: ${{ steps.count-issues.outputs.issue-count > 0 }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.WIDGETS_REPOSITORY }}
+          token: ${{ secrets.WIDGETS_TOKEN }}
       - id: compute-version
         uses: jzheaux/spring-io-actions/compute-version@main
       - if: ${{ steps.compute-version.outputs.snapshot == 'true' }}
         id: release-version
         uses: jzheaux/spring-io-actions/get-todays-release-version@main
         with:
+          milestone-token: ${{ secrets.WIDGETS_TOKEN }}
+          milestone-repository: ${{ env.WIDGETS_REPOSITORY }}
           version: ${{ steps.compute-version.outputs.snapshot }}
       - if: ${{ steps.release-version.outputs.release-version != '' }}
         id: count-issues
         uses: jzheaux/spring-io-actions/count-open-issues@main
         with:
           milestone: ${{ steps.release-version.outputs.release-version }}
-  releaser:
+
+  release-launcher:
     needs: planner
     if: ${{ needs.planner.outputs.should-release == 'true' }}
     runs-on: ubuntu-latest

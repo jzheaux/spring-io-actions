@@ -76,32 +76,59 @@ describe('Milestones', () => {
     });
 
 	describe('findEarliestOpenMilestoneByGeneration', () => {
-		it('finds earliest milestone', async() => {
+		it('finds milestone due today', async() => {
+			const today = new Date();
+			const nextYear = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
 			mockListMilestones.mockResolvedValue({
 				data: [
 				{
 					title: '1.1.4',
 					number: 4,
-					due_on: '2025-12-03'
+					due_on: today.toISOString()
 				},
 				{
 					title: '1.2.3',
 					number: 3,
-					due_on: '2025-02-05'
+					due_on: nextYear.toISOString()
 				},
 				{
 					title: '1.2.3-M3',
 					number: 1,
-					due_on: '2025-12-03'
+					due_on: today.toISOString()
 				},
 				{
 					title: '1.2.3-RC1',
 					number: 2,
-					due_on: '2026-01-07'
+					due_on: nextYear.toISOString()
 				},
 			]});
-			const milestone = await milestones.findEarliestOpenMilestoneInGeneration({ major: 1, minor: 2});
+			const milestone = await milestones.findOpenMilestoneDueTodayForGeneration({ major: 1, minor: 2});
 			expect(milestone.name).toBe("1.2.3-M3");
+		});
+
+		it('finds no milestone due today', async() => {
+			const today = new Date();
+			const nextYear = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+			mockListMilestones.mockResolvedValue({
+				data: [
+					{
+						title: '1.1.4',
+						number: 4,
+						due_on: today.toISOString()
+					},
+					{
+						title: '1.2.3',
+						number: 3,
+						due_on: nextYear.toISOString()
+					},
+					{
+						title: '1.2.3-RC1',
+						number: 2,
+						due_on: nextYear.toISOString()
+					},
+				]});
+			const milestone = await milestones.findOpenMilestoneDueTodayForGeneration({ major: 1, minor: 2});
+			expect(milestone).toBe(null);
 		});
 	})
 });

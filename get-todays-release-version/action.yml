@@ -1,10 +1,10 @@
 name: "get-todays-release-version"
-description: "An action that matches the earliest open milestone to the project's current snapshot"
+description: "An action gets any milestone due today that corresponds to the given version"
 author: "jzheaux"
 
 inputs:
-  version:
-    description: "The current project version"
+  snapshot-version:
+    description: "The current project SNAPSHOT version"
     required: true
   milestone-token:
     description: "The token needed to query project milestone information"
