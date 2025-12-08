@@ -1,4 +1,6 @@
 const { Octokit } = require("@octokit/rest");
+const { Version } = require("./versions");
+const { compareVersions } = require("compare-versions");
 
 /**
  * A class for interacting with GitHub milestones.
@@ -39,6 +41,36 @@ class Milestones {
 			return null;
 		}
 
+		return {
+			number: m.number,
+			name: m.title,
+			dueDate: m.due_on ? new Date(m.due_on) : null,
+			type: this.milestoneType,
+		};
+	}
+
+	async findEarliestOpenMilestoneInGeneration(generation) {
+		const { data: milestones } = await this.gh.rest.issues.listMilestones({
+			owner: this.owner,
+			repo: this.repo,
+			state: "open",
+			per_page: 100,
+		});
+
+		const filtered = milestones
+			.filter((m) => {
+				const [major, minor, rest] = m.title.split("\.");
+				return (
+					generation.major === parseInt(major) &&
+					generation.minor === parseInt(minor)
+				);
+			})
+			.sort((a, b) => compareVersions(a.title, b.title));
+		if (!filtered || !filtered.length) {
+			return null;
+		}
+
+		const m = filtered[0];
 		return {
 			number: m.number,
 			name: m.title,

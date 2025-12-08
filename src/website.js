@@ -39,7 +39,8 @@ class Website {
 			const majorMinor = _generation(generation.generation);
 			if (version.isSameMajorMinor(majorMinor)) {
 				return {
-					generation: majorMinor,
+					major: majorMinor.major,
+					minor: majorMinor.minor,
 					dayOfWeek,
 					weekOfMonth,
 					oss: {

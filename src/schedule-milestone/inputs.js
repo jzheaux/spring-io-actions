@@ -7,8 +7,7 @@ class Inputs {
 		this._description = core.getInput("description");
 		this._repository =
 			core.getInput("repository") || process.env.GITHUB_REPOSITORY;
-		this._token =
-			core.getInput("token") || process.env.GITHUB_TOKEN;
+		this._token = core.getInput("token") || process.env.GITHUB_TOKEN;
 	}
 
 	get versionDate() {

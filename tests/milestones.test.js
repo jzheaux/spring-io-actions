@@ -6,17 +6,20 @@ const {Octokit} = require('@octokit/rest');
 
 describe('Milestones', () => {
     let milestones;
+	let mockListMilestones;
     let mockUpdateMilestone;
     let mockCreateMilestone;
 
     beforeEach(() => {
         process.env.GITHUB_REPOSITORY = 'owner/repo';
+		mockListMilestones = jest.fn();
         mockUpdateMilestone = jest.fn();
         mockCreateMilestone = jest.fn();
         Octokit.mockImplementation(() => {
             return {
                 rest: {
                     issues: {
+						listMilestones: mockListMilestones,
                         updateMilestone: mockUpdateMilestone,
                         createMilestone: mockCreateMilestone
                     }
@@ -71,4 +74,34 @@ describe('Milestones', () => {
             });
         });
     });
+
+	describe('findEarliestOpenMilestoneByGeneration', () => {
+		it('finds earliest milestone', async() => {
+			mockListMilestones.mockResolvedValue({
+				data: [
+				{
+					title: '1.1.4',
+					number: 4,
+					due_on: '2025-12-03'
+				},
+				{
+					title: '1.2.3',
+					number: 3,
+					due_on: '2025-02-05'
+				},
+				{
+					title: '1.2.3-M3',
+					number: 1,
+					due_on: '2025-12-03'
+				},
+				{
+					title: '1.2.3-RC1',
+					number: 2,
+					due_on: '2026-01-07'
+				},
+			]});
+			const milestone = await milestones.findEarliestOpenMilestoneInGeneration({ major: 1, minor: 2});
+			expect(milestone.name).toBe("1.2.3-M3");
+		});
+	})
 });

@@ -1,0 +1,23 @@
+name: "compute-release-version"
+description: "An action that matches the earliest open milestone to the project's current snapshot"
+author: "jzheaux"
+
+inputs:
+  milestone-title:
+    description: "The current project version"
+    required: true
+  milestone-token:
+    description: "The token needed to query project milestone information"
+    required: true
+
+  milestone-repository:
+    description: "The repository to query project milestone information"
+    required: false
+
+outputs:
+  release-version:
+    description: "The project's release version"
+
+runs:
+  using: "node20"
+  main: '../dist/compute-release-version/main/index.js'

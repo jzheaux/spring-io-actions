@@ -1,0 +1,34 @@
+name: "push-next-development-version"
+description: "Push the next development version"
+author: "jzheaux"
+
+inputs:
+  version:
+    description: "The version number to use"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+  - name: Compute Snapshot
+    id: compute-snapshot
+    uses: jzheaux/spring-io-actions/compute-version@main
+  - name: Compute Release Version
+    uses: jzheaux/spring-io-actions/compute-release-version@main
+    with:
+      version: ${{ steps.compute-snapshot.outputs.version }}
+  - name: Push Next Development Version
+    shell: bash
+    env:
+      VERSION: ${{ steps.compute-release.version.outputs.release-version }}
+    run: |
+      if test -f pom.xml
+      then
+        mvn versions:set -DnewVersion=$VERSION -DgenerateBackupPoms=false -DprocessAllModules=true -B -ntp
+      else
+        sed -i "s/version=.*/version=$VERSION/" gradle.properties
+      fi
+      git config user.name 'github-actions[bot]'
+      git config user.email 'github-actions[bot]@users.noreply.github.com'
+      git commit -am "Release $VERSION"
+      git push
