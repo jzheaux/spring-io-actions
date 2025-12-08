@@ -30252,13 +30252,13 @@ module.exports = {
 
 const core = __nccwpck_require__(7484);
 const { Inputs } = __nccwpck_require__(6754);
-const { Announce } = __nccwpck_require__(3786);
+const { Announce } = __nccwpck_require__(2370);
 
 async function run() {
 	const inputs = new Inputs();
 	const announce = new Announce(inputs.gchatWebhookUrl, inputs.projectName);
 	try {
-		await announce.announceRelease(inputs.milestoneTitle);
+		await announce.announceRelease(inputs.version);
 	} catch (error) {
 		core.setFailed(error.message);
 	}
@@ -30281,7 +30281,7 @@ const core = __nccwpck_require__(7484);
 class Inputs {
 	constructor() {
 		this._gchatWebhookUrl = core.getInput("gchat-webhook-url");
-		this._milestoneTitle = core.getInput("milestone-title");
+		this._version = core.getInput("version");
 		this._projectName = core.getInput("project-name", { required: false });
 	}
 
@@ -30289,8 +30289,8 @@ class Inputs {
 		return this._gchatWebhookUrl;
 	}
 
-	get milestoneTitle() {
-		return this._milestoneTitle;
+	get version() {
+		return this._version;
 	}
 
 	get projectName() {
@@ -30305,7 +30305,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 3786:
+/***/ 2370:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const axios = __nccwpck_require__(7269);

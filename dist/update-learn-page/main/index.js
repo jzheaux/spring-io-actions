@@ -32761,7 +32761,7 @@ const { Version } = __nccwpck_require__(6100);
 
 async function run() {
 	const inputs = new Inputs();
-	if (inputs.milestoneTitle.endsWith("-SNAPSHOT")) {
+	if (inputs.version.endsWith("-SNAPSHOT")) {
 		core.setFailed(
 			"Please specify a non-SNAPSHOT release version to publish; it's accompanying SNAPSHOT version will also be published",
 		);
@@ -32788,7 +32788,7 @@ async function run() {
 	}
 
 	const learnPage = new LearnPage(file ? file.content : "[]");
-	const version = new Version(inputs.milestoneTitle);
+	const version = new Version(inputs.version);
 	const refDocUrl = inputs.refDocUrl.replace(
 		/{project}|{slug}/g,
 		inputs.projectSlug,
@@ -32818,7 +32818,7 @@ async function run() {
 	}
 
 	const updatedContent = Buffer.from(learnPage.toString()).toString("base64");
-	const message = `Update #learn Page for ${inputs.projectName} ${inputs.milestoneTitle}`;
+	const message = `Update #learn Page for ${inputs.projectName} ${inputs.version}`;
 	await octokit.repos.createOrUpdateFileContents({
 		owner,
 		repo,
@@ -32845,7 +32845,7 @@ const core = __nccwpck_require__(7484);
 
 class Inputs {
 	constructor() {
-		this._milestoneTitle = core.getInput("milestone-title", { required: true });
+		this._version = core.getInput("version", { required: true });
 		this._websiteToken = core.getInput("website-token", { required: true });
 		this._apiDocUrl =
 			core.getInput("api-doc-url", { required: false }) ||
@@ -32901,8 +32901,8 @@ class Inputs {
 		return this._refDocUrl;
 	}
 
-	get milestoneTitle() {
-		return this._milestoneTitle;
+	get version() {
+		return this._version;
 	}
 
 	get commercial() {

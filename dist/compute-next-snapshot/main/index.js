@@ -25654,9 +25654,9 @@ const { Version } = __nccwpck_require__(6100);
 const inputs = new Inputs();
 
 async function run() {
-	const version = new Version(inputs.milestoneTitle);
+	const version = new Version(inputs.version);
 	const next = version.nextSnapshot();
-	core.setOutput("snapshot-version", next.version);
+	core.setOutput("version", next.version);
 }
 
 if (require.main === require.cache[eval('__filename')]) {
@@ -25677,11 +25677,11 @@ const core = __nccwpck_require__(7484);
 
 class Inputs {
 	constructor() {
-		this._milestoneTitle = core.getInput("milestone-title", { required: true });
+		this._version = core.getInput("version", { required: true });
 	}
 
-	get milestoneTitle() {
-		return this._milestoneTitle;
+	get version() {
+		return this._version;
 	}
 }
 
