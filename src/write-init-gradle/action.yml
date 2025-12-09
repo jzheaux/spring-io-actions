@@ -1,0 +1,18 @@
+name: "write-init-gradle"
+description: "Write an init.gradle file"
+author: "jzheaux"
+
+inputs:
+  artifact-repository-url:
+    description: "The artifact repository to use to resolve artifacts"
+    required: true
+  artifact-repository-username:
+    description: "The artifact repository username"
+    required: false
+  artifact-repository-password:
+    description: "The artifact repository password"
+    required: false
+
+runs:
+  using: "node16"
+  main: "index.js"
