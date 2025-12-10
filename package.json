@@ -4,6 +4,7 @@
   "description": "Release-related actions for Spring projects",
   "dependencies": {
     "@actions/core": "^1.11.1",
+    "@actions/io": "^1.1.3",
     "@octokit/rest": "^18.12.0",
     "axios": "^1.13.2",
     "compare-versions": "^6.1.0",
@@ -30,6 +31,7 @@
     "compile-plan-on-gchat-main": "ncc build src/plan-on-gchat/index.js --out dist/plan-on-gchat/main --source-map --no-source-map-register",
     "compile-schedule-milestone-main": "ncc build src/schedule-milestone/index.js --out dist/schedule-milestone/main --source-map --no-source-map-register",
     "compile-update-learn-page-main": "ncc build src/update-learn-page/index.js --out dist/update-learn-page/main --source-map --no-source-map-register",
+    "compile-write-init-gradle-main": "ncc build src/write-init-gradle/index.js --out dist/write-init-gradle/main --source-map --no-source-map-register",
     "compile": "npm-run-all --parallel compile-*",
     "check": "npm-run-all --parallel prettier-check",
     "format": "npm-run-all --parallel prettier-write",
