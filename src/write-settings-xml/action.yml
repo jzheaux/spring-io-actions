@@ -1,0 +1,16 @@
+name: "write-settings-xml"
+description: "Write a settings.xml file for Maven"
+author: "jzheaux"
+inputs:
+  artifact-repository-url:
+    description: "The artifact repository to use to resolve artifacts; uses the project's declared repos by default"
+    required: false
+  artifact-repository-username:
+    description: "The artifact repository username; requires artifact-repository-url to be set"
+    required: false
+  artifact-repository-password:
+    description: "The artifact repository password; requires artifact-repository-url and -username to be set"
+    required: false
+runs:
+  using: "node16"
+  main: "dist/index.js"
