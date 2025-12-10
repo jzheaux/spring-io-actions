@@ -1,0 +1,32 @@
+<settings>
+  <servers>
+    <server>
+      <id>additional-repository</id>
+      <username>${env.ARTIFACT_REPOSITORY_USERNAME}</username>
+      <password>${env.ARTIFACT_REPOSITORY_PASSWORD}</password>
+    </server>
+  </servers>
+  <profiles>
+    <profile>
+      <id>additional-repository-profile</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <repositories>
+        <repository>
+          <id>additional-repository</id>
+          <url>${env.ARTIFACT_REPOSITORY_URL}</url>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>additional-repository</id>
+          <url>${env.ARTIFACT_REPOSITORY_URL}</url>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>additional-repository-profile</activeProfile>
+  </activeProfiles>
+</settings>
